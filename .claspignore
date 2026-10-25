@@ -1,0 +1,6 @@
+# Files to ignore when pushing to Google Apps Script
+**/**
+!Code.js
+!Code.gs
+!Index.html
+!appsscript.json

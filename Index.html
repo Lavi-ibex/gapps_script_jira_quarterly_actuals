@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibex Quarterly Actual Effort Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-light: #334155;
+      --border: #475569;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --accent: #818cf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --card-bg: #1e293b;
+      --table-stripe: rgba(255, 255, 255, 0.02);
+      --table-hover: rgba(56, 189, 248, 0.08);
+      --nested-bg: #0b1120;
+      --radius: 10px;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body.theme-light {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-light: #f1f5f9;
+      --border: #cbd5e1;
+      --border-subtle: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent: #6366f1;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --card-bg: #ffffff;
+      --table-stripe: rgba(0, 0, 0, 0.02);
+      --table-hover: rgba(2, 132, 199, 0.06);
+      --nested-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Section Containers */
+    .dashboard-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-title-wrap {
+      margin-bottom: 20px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .section-heading {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-subtext {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Header Bar */
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .logo-title-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--surface-light);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .title-group h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .badge-quarter {
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .source-info-bar {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Quarter selector select styling */
+    .quarter-select-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    .quarter-select-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quarter-select {
+      background: transparent;
+      color: var(--text);
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .quarter-select option {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .btn {
+      background: var(--surface-light);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      border-color: #0369a1;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .btn-icon {
+      padding: 8px 10px;
+    }
+
+    /* Rotating animation for refresh icon */
+    .rotating {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Status Badge */
+    .badge-status-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-status-live {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-status-cache {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Error Banner */
+    .error-banner {
+      background: rgba(248, 113, 113, 0.15);
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: #fca5a5;
+      font-size: 13.5px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(3px);
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(56, 189, 248, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Overall Summary Stats */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card .label {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .stat-card .value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .stat-card .sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Subsections */
+    .overview-subsection {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+
+    .subsection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .subsection-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subsection-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .team-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .team-overview-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .team-overview-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .team-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .team-card-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .team-card-effort {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    .team-share-bar-wrap {
+      background: rgba(0, 0, 0, 0.2);
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .team-share-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+    }
+
+    .team-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .team-card-pct {
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+    }
+
+    /* Jira Info Callout */
+    .jira-info-callout {
+      background: var(--surface-light);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-top: 18px;
+      margin-bottom: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .jira-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .jira-info-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .jira-chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .jira-info-callout.open .jira-chevron {
+      transform: rotate(90deg);
+      color: var(--primary);
+    }
+
+    .jira-info-hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .jira-info-body {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-top: 10px;
+      display: none;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 10px;
+    }
+
+    .jira-info-callout.open .jira-info-body {
+      display: block;
+    }
+
+    .jira-info-body code {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 42px;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    /* Filter Pills */
+    .bucket-pills, .team-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      background: var(--surface-light);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .pill-btn:hover {
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .pill-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .pill-count {
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Widgets Container */
+    .widgets-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .team-widget {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: border-color 0.2s ease;
+    }
+
+    .widget-header {
+      padding: 14px 20px;
+      background: var(--surface-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid transparent;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .team-widget.expanded .widget-header {
+      border-bottom-color: var(--border-subtle);
+    }
+
+    .widget-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .widget-chevron {
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .team-widget.expanded .widget-chevron {
+      transform: rotate(90deg);
+      color: var(--primary);
+    }
+
+    .widget-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .widget-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .widget-stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .widget-stat-pill strong {
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .widget-body {
+      display: none;
+      overflow-x: auto;
+    }
+
+    .team-widget.expanded .widget-body {
+      display: block;
+    }
+
+    /* Tables */
+    table.epics-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table.epics-table thead th {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    table.epics-table thead th:hover {
+      color: var(--text);
+    }
+
+    table.epics-table tbody tr.epic-row {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.1s ease;
+      cursor: pointer;
+    }
+
+    table.epics-table tbody tr.epic-row:hover {
+      background-color: var(--table-hover);
+    }
+
+    table.epics-table tbody tr.epic-row:nth-child(4n+1) {
+      background-color: var(--table-stripe);
+    }
+
+    table.epics-table td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    .epic-key-cell {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .epic-chevron {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    tr.epic-row.children-open .epic-chevron {
+      transform: rotate(90deg);
+      color: var(--primary);
+    }
+
+    .jira-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .jira-link:hover {
+      text-decoration: underline;
+    }
+
+    .epic-summary-text {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .sp-cell {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--primary);
+      text-align: right;
+    }
+
+    /* Nested Children Rows */
+    tr.children-row {
+      display: none;
+      background: var(--nested-bg);
+    }
+
+    tr.children-row.open {
+      display: table-row;
+    }
+
+    td.children-container-cell {
+      padding: 12px 20px 16px 44px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.children-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    table.children-table thead th {
+      background: var(--surface-light);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.children-table tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.1s ease;
+    }
+
+    table.children-table tbody tr:hover {
+      background-color: var(--table-hover);
+    }
+
+    table.children-table td {
+      padding: 8px 12px;
+    }
+
+    .badge-type {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-type.Story {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-type.Bug {
+      background: rgba(248, 113, 113, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .badge-type.Task {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-status {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.15);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .bucket-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      background: rgba(129, 140, 248, 0.15);
+      color: #c7d2fe;
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      white-space: nowrap;
+    }
+
+    .bucket-badge.bucket-none {
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    /* Drag Target */
+    .drag-target {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      border: 3px dashed var(--primary);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .drag-target.active {
+      display: flex;
+    }
+
+    .drag-target-inner {
+      text-align: center;
+    }
+
+    .drag-target-inner h2 {
+      font-size: 28px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .drag-target-inner p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 20px 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      td.children-container-cell {
+        padding-left: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Drag & Drop overlay for optional manual CSV upload -->
+  <div class="drag-target" id="dragTarget">
+    <div class="drag-target-inner">
+      <h2>Drop CSV File Here</h2>
+      <p>Release the file to reload actual effort data</p>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Fetching live data from Jira...</div>
+  </div>
+
+  <div class="container">
+    <!-- Error Banner -->
+    <div class="error-banner" id="errorBanner">
+      <span id="errorMessage">Error loading data</span>
+      <button class="btn" id="btnRetry" type="button">Retry</button>
+    </div>
+
+    <!-- SECTION 1: OVERVIEW & EXECUTIVE SUMMARY -->
+    <section class="dashboard-section" id="sectionOverview">
+      <div class="header-top">
+        <div class="title-group">
+          <div class="logo-title-row">
+            <div class="logo-wrapper" title="Ibex Medical Analytics">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 585.7 286.6" class="ibex-logo-svg" style="height: 34px; width: auto; overflow: visible; vertical-align: middle;">
+                <defs>
+                  <linearGradient id="ibex-orange-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#FF0786"/>
+                    <stop offset="35.7%" stop-color="#FF2D00"/>
+                    <stop offset="100%" stop-color="#FF9C09"/>
+                  </linearGradient>
+                </defs>
+                <g fill="#FFFFFF">
+                  <path d="M73.8,93.4c0-7.1-5.8-12.9-12.9-12.9s-12.9,5.8-12.9,12.9l0,124.2c0,7.1,5.8,12.9,12.9,12.9s12.9-5.8,12.9-12.9L73.8,93.4z M171.5,230.4c32.1,0,48.3-17.8,48.3-45c0-17.4-6.5-29.4-23.2-35.8c9.1-4.5,16.5-15.6,16.5-30.3c0-20.5-12-38.7-45.6-38.7h-59.2c-7.1,0-12.9,5.8-12.9,12.9l0,124c0,7.1,5.8,12.9,12.9,12.9H171.5z M121.2,163.6h50.3c14.7,0,22,8.2,22,21.8c0,13.4-6.2,21.8-22,21.8h-50.3L121.2,163.6z M121.2,103.7h46.3c14,0,19.8,7.3,19.8,18.9c0,11.1-5.8,19.1-19.8,19.1h-46.3L121.2,103.7z M262.4,103.7h71.4c6.5,0,11.6-5.1,11.6-11.6c0-6.5-5.1-11.6-11.6-11.6h-84.3c-7.1,0-12.9,5.8-12.9,12.9l0,124c0,7.1,5.8,12.9,12.9,12.9h86.8c6.5,0,11.6-5.1,11.6-11.6c0-6.5-5.1-11.6-11.6-11.6h-73.9v-41h57c6.2,0,11.4-5.1,11.4-11.4s-5.1-11.4-11.4-11.4h-57L262.4,103.7z"/>
+                  <path d="M409.2,139.2c-3.3,0-6.5-1.2-9-3.7L366,101.2c-5-5-5-13.1,0-18.1c5-5,13.1-5,18.1,0l34.2,34.2c5,5,5,13.1,0,18.1C415.8,137.9,412.5,139.2,409.2,139.2z"/>
+                  <path d="M375,231.6c-3.3,0-6.5-1.2-9-3.7c-5-5-5-13.1,0-18.1l34.2-34.2c5-5,13.1-5,18.1,0c5,5,5,13.1,0,18.1l-34.2,34.2C381.6,230.4,378.3,231.6,375,231.6z"/>
+                  <path d="M501.6,231.6c-3.3,0-6.5-1.2-9-3.7l-34.2-34.2c-5-5-5-13.1,0-18.1c5-5,13.1-5,18.1,0l34.2,34.2c5,5,5,13.1,0,18.1C508.2,230.4,504.9,231.6,501.6,231.6z"/>
+                  <path d="M438.3,172.7c9.5,0,17.3-7.7,17.3-17.3s-7.7-17.3-17.3-17.3s-17.3,7.7-17.3,17.3S428.8,172.7,438.3,172.7"/>
+                </g>
+                <path fill="url(#ibex-orange-gradient)" d="M467.5,139.2c-3.3,0-6.5-1.2-9-3.7c-5-5-5-13.1,0-18.1L528.8,47c5-5,13.1-5,18.1,0c5,5,5,13.1,0,18.1l-70.3,70.3C474,137.9,470.7,139.2,467.5,139.2z"/>
+              </svg>
+            </div>
+            <h1>
+              <span id="dashboardQuarterTitle">2026 Q3</span> - Actual Effort Dashboard
+              <span class="badge-quarter" id="badgeQuarterText">26Q3 Actuals</span>
+            </h1>
+          </div>
+          <div class="source-info-bar">
+            <span>Data Source: <strong>Jira Cloud API</strong></span>
+            <span class="badge-status-pill badge-status-live" id="badgeCacheStatus">Live Data</span>
+            <span>Last Updated: <strong id="lblLastUpdated">--</strong></span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Dynamic Quarter Selector -->
+          <div class="quarter-select-wrapper" title="Select quarter to inspect actual effort">
+            <span class="quarter-select-label">Quarter:</span>
+            <select id="quarterSelect" class="quarter-select">
+              <option value="2026_Q3" selected>2026 Q3</option>
+              <option value="2026_Q4">2026 Q4</option>
+            </select>
+          </div>
+
+          <!-- Refresh Live from Jira Button -->
+          <button class="btn btn-primary" id="btnRefreshLive" type="button" title="Fetch fresh data from Jira bypassing cache">
+            <svg id="refreshIcon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh Live
+          </button>
+
+          <!-- Theme Toggle Button -->
+          <button class="btn btn-icon" id="btnThemeToggle" type="button" title="Toggle Dark/Light Mode">
+            <span id="themeIcon">☀️</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subsection 1A: Section Header & Global Key Metrics -->
+      <div class="section-title-wrap">
+        <span class="section-tag">Section 1</span>
+        <h2 class="section-heading">Overview & Executive Summary</h2>
+        <p class="section-subtext">High-level delivery summary across all engineering and clinical teams for <span class="lblQuarterSubtext">2026 Q3</span></p>
+      </div>
+
+      <!-- Jira Data Source Explanation Callout -->
+      <div class="jira-info-callout" id="jiraInfoCallout">
+        <div class="jira-info-header" id="jiraInfoHeader" title="Click to view Jira data retrieval methodology">
+          <div class="jira-info-title-wrap">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <strong>Jira Data Retrieval Method & Queried Information</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="jira-info-hint" id="jiraInfoHint">Click to expand</span>
+            <svg class="jira-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+        <p class="jira-info-body">
+          Actual effort is queried dynamically via the Jira Cloud REST API. The backend scans Jira Agile boards for active and closed sprints matching the selected quarter, fetches all child issues in status category <strong>Done</strong> assigned to those sprints, sums their completed <strong>Story Points</strong> (<code>customfield_10037</code>), attributes effort to the responsible child <strong>Team</strong> (primary: <code>customfield_10001</code>, falling back to <code>iTeam</code> <code>customfield_10128</code>), and links them to their parent Jira Epics. Parent epic metadata captures <strong>Epic Quarter</strong> (<code>customfield_10217</code>), release <strong>Fix Versions</strong>, labels, and the strategic <strong>Epic Bucket</strong> (<code>customfield_12204</code>).
+        </p>
+      </div>
+
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="label">Total Actual Effort</div>
+          <div class="value" id="statTotalSp">0.0 SP</div>
+          <div class="sub">Across all teams</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Active Teams</div>
+          <div class="value" id="statTeamsCount">0</div>
+          <div class="sub">Reporting effort</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Unique Epics</div>
+          <div class="value" id="statEpicsCount">0</div>
+          <div class="sub">With recorded work</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Child Tickets</div>
+          <div class="value" id="statTicketsCount">0</div>
+          <div class="sub">Completed items</div>
+        </div>
+      </div>
+
+      <!-- Subsection 1B: Epic Bucket Effort Breakdown -->
+      <div class="overview-subsection">
+        <div class="subsection-header">
+          <div class="subsection-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Epic Bucket Effort Breakdown
+          </div>
+          <div class="subsection-hint">Click any bucket card to jump directly to its detailed bucket epics below</div>
+        </div>
+
+        <div class="team-cards-grid" id="overviewBucketCards">
+          <!-- Dynamically populated per bucket -->
+        </div>
+      </div>
+
+      <!-- Subsection 1C: Team Effort Breakdown -->
+      <div class="overview-subsection">
+        <div class="subsection-header">
+          <div class="subsection-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Team Effort Breakdown
+          </div>
+          <div class="subsection-hint">Click any team card to jump directly to its detailed epics below</div>
+        </div>
+
+        <div class="team-cards-grid" id="overviewTeamCards">
+          <!-- Dynamically populated per team -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DETAILED RESULTS (BY TEAM & BY BUCKET) -->
+    <section class="dashboard-section" id="sectionDetailed">
+      <!-- Global Search Control -->
+      <div class="controls-bar" style="margin-bottom: 28px;">
+        <div class="search-row">
+          <div class="search-box">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="globalSearch" placeholder="Filter by epic key, child key, bucket, summary keywords across all teams and buckets...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2A: Detailed Results by Bucket -->
+      <div id="sectionDetailedBuckets">
+        <div class="section-title-wrap" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <span class="section-tag">Section 2A</span>
+            <h2 class="section-heading">Detailed Results by Bucket</h2>
+            <p class="section-subtext">Inspect epics and underlying child tickets grouped by strategic epic bucket</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn" id="btnExpandAllBuckets" type="button" title="Expand all bucket tables">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+              Expand All Buckets
+            </button>
+            <button class="btn" id="btnCollapseAllBuckets" type="button" title="Collapse all bucket tables">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 4v4H5m10-4v4h4M9 20v-4H5m10 4v-4h4"/></svg>
+              Collapse Buckets
+            </button>
+          </div>
+        </div>
+
+        <div class="bucket-pills" id="bucketPills" style="margin-bottom: 18px;"></div>
+        <div class="widgets-container" id="bucketWidgetsContainer" style="margin-bottom: 40px;"></div>
+      </div>
+
+      <!-- Part 2B: Detailed Results by Team -->
+      <div id="sectionDetailedTeams" style="border-top: 1px solid var(--border-subtle); padding-top: 32px;">
+        <div class="section-title-wrap" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <span class="section-tag">Section 2B</span>
+            <h2 class="section-heading">Detailed Results by Team</h2>
+            <p class="section-subtext">Inspect epics and underlying child tickets grouped by contributing team</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn" id="btnExpandAll" type="button" title="Expand all team tables">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+              Expand All Teams
+            </button>
+            <button class="btn" id="btnCollapseAll" type="button" title="Collapse all team tables">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 4v4H5m10-4v4h4M9 20v-4H5m10 4v-4h4"/></svg>
+              Collapse Teams
+            </button>
+          </div>
+        </div>
+
+        <div class="team-pills" id="teamPills" style="margin-bottom: 18px;"></div>
+        <div class="widgets-container" id="widgetsContainer"></div>
+      </div>
+    </section>
+
+    <footer>
+      Ibex Medical Analytics - Quarterly Planning Actual Effort Dashboard - Powered by Jira Cloud API & Google Apps Script
+    </footer>
+  </div>
+
+  <script>
+    // State
+    let teamsData = {};
+    let bucketsData = {};
+    let activeTeamFilter = 'ALL';
+    let activeBucketFilter = 'ALL';
+    let searchQuery = '';
+    let currentQuarter = '2026_Q3';
+
+    const teamSortStates = {};
+    const teamExpandedStates = {};
+    const epicExpandedStates = {};
+
+    const bucketSortStates = {};
+    const bucketExpandedStates = {};
+    const bucketEpicExpandedStates = {};
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('ibex-actuals-theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('theme-light');
+        document.getElementById('themeIcon').textContent = '🌙';
+      } else {
+        document.body.classList.remove('theme-light');
+        document.getElementById('themeIcon').textContent = '☀️';
+      }
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('theme-light');
+      localStorage.setItem('ibex-actuals-theme', isLight ? 'light' : 'dark');
+      document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+    }
+
+    // UI Loading state
+    function showLoading(show, message) {
+      const overlay = document.getElementById('loadingOverlay');
+      const text = document.getElementById('loadingText');
+      if (show) {
+        text.textContent = message || 'Fetching live data from Jira...';
+        overlay.style.display = 'flex';
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+
+    function showError(msg) {
+      const banner = document.getElementById('errorBanner');
+      const text = document.getElementById('errorMessage');
+      text.textContent = msg;
+      banner.style.display = 'flex';
+    }
+
+    function hideError() {
+      document.getElementById('errorBanner').style.display = 'none';
+    }
+
+    // Process rows into structured team and bucket aggregations
+    function processRows(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return { teams: {}, buckets: {} };
+
+      const teams = {};
+      const buckets = {};
+
+      for (let i = 0; i < rows.length; i++) {
+        const item = rows[i];
+        const team = (item.childTeam || 'Unassigned').trim();
+        const epicKey = (item.epicKey || 'Unassigned').trim();
+        const epicSummary = (item.epicSummary || '').trim();
+        const epicBucket = (item.epicBucket || 'Other').trim() || 'Other';
+        const sp = typeof item.childStoryPoints === 'number' ? item.childStoryPoints : (parseFloat(item.childStoryPoints) || 0.0);
+
+        const childKey = (item.childKey || '').trim();
+        const childType = (item.childType || '').trim();
+        const childStatus = (item.childStatus || '').trim();
+        const childSummary = (item.childSummary || '').trim();
+        const childAssignee = (item.childAssignee || '').trim();
+        const sprint = (item.childSprint || '').trim();
+
+        if (!team || !epicKey) continue;
+
+        // 1. Team Aggregation
+        if (!teams[team]) {
+          teams[team] = {
+            name: team,
+            totalSp: 0.0,
+            totalTickets: 0,
+            epics: {}
+          };
+          if (teamExpandedStates[team] === undefined) {
+            teamExpandedStates[team] = false;
+          }
+        }
+
+        teams[team].totalSp += sp;
+        teams[team].totalTickets++;
+
+        if (!teams[team].epics[epicKey]) {
+          teams[team].epics[epicKey] = {
+            key: epicKey,
+            summary: epicSummary,
+            bucket: epicBucket,
+            sp: 0.0,
+            childCount: 0,
+            children: []
+          };
+        } else {
+          if (!teams[team].epics[epicKey].summary && epicSummary) {
+            teams[team].epics[epicKey].summary = epicSummary;
+          }
+          if (!teams[team].epics[epicKey].bucket && epicBucket) {
+            teams[team].epics[epicKey].bucket = epicBucket;
+          }
+        }
+
+        teams[team].epics[epicKey].sp += sp;
+        teams[team].epics[epicKey].childCount++;
+
+        if (childKey) {
+          teams[team].epics[epicKey].children.push({
+            key: childKey,
+            type: childType,
+            status: childStatus,
+            summary: childSummary,
+            assignee: childAssignee,
+            team: team,
+            sprint: sprint,
+            sp: sp
+          });
+        }
+
+        // 2. Bucket Aggregation
+        const bucketName = epicBucket || 'Other';
+        if (!buckets[bucketName]) {
+          buckets[bucketName] = {
+            name: bucketName,
+            totalSp: 0.0,
+            totalTickets: 0,
+            epics: {}
+          };
+          if (bucketExpandedStates[bucketName] === undefined) {
+            bucketExpandedStates[bucketName] = false;
+          }
+        }
+
+        buckets[bucketName].totalSp += sp;
+        buckets[bucketName].totalTickets++;
+
+        if (!buckets[bucketName].epics[epicKey]) {
+          buckets[bucketName].epics[epicKey] = {
+            key: epicKey,
+            summary: epicSummary,
+            bucket: epicBucket,
+            sp: 0.0,
+            childCount: 0,
+            teams: new Set(),
+            children: []
+          };
+        } else {
+          if (!buckets[bucketName].epics[epicKey].summary && epicSummary) {
+            buckets[bucketName].epics[epicKey].summary = epicSummary;
+          }
+        }
+
+        buckets[bucketName].epics[epicKey].sp += sp;
+        buckets[bucketName].epics[epicKey].childCount++;
+        buckets[bucketName].epics[epicKey].teams.add(team);
+
+        if (childKey) {
+          buckets[bucketName].epics[epicKey].children.push({
+            key: childKey,
+            type: childType,
+            status: childStatus,
+            summary: childSummary,
+            assignee: childAssignee,
+            team: team,
+            sprint: sprint,
+            sp: sp
+          });
+        }
+      }
+
+      // Round values
+      for (const t in teams) {
+        teams[t].totalSp = Math.round(teams[t].totalSp * 10) / 10;
+        for (const e in teams[t].epics) {
+          teams[t].epics[e].sp = Math.round(teams[t].epics[e].sp * 10) / 10;
+        }
+      }
+
+      for (const b in buckets) {
+        buckets[b].totalSp = Math.round(buckets[b].totalSp * 10) / 10;
+        for (const e in buckets[b].epics) {
+          buckets[b].epics[e].sp = Math.round(buckets[b].epics[e].sp * 10) / 10;
+        }
+      }
+
+      return { teams, buckets };
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function focusOnTeam(team) {
+      activeTeamFilter = team;
+      teamExpandedStates[team] = true;
+      renderPills();
+      renderWidgets();
+      const el = document.getElementById('widget-' + team.replace(/\s+/g, '_'));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function focusOnBucket(bucketName) {
+      activeBucketFilter = bucketName;
+      bucketExpandedStates[bucketName] = true;
+      renderBucketPills();
+      renderBucketWidgets();
+      const bId = 'widget-bucket-' + bucketName.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const el = document.getElementById(bId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderSummary() {
+      let totalSp = 0;
+      let totalTickets = 0;
+      const allEpicKeys = new Set();
+      const teamList = Object.keys(teamsData);
+
+      for (const t of teamList) {
+        totalSp += teamsData[t].totalSp;
+        totalTickets += teamsData[t].totalTickets;
+        for (const k in teamsData[t].epics) {
+          allEpicKeys.add(k);
+        }
+      }
+
+      totalSp = Math.round(totalSp * 10) / 10;
+
+      document.getElementById('statTotalSp').textContent = totalSp.toFixed(1) + ' SP';
+      document.getElementById('statTeamsCount').textContent = teamList.length;
+      document.getElementById('statEpicsCount').textContent = allEpicKeys.size;
+      document.getElementById('statTicketsCount').textContent = totalTickets.toLocaleString();
+
+      // Bucket Breakdown Cards
+      const bucketContainer = document.getElementById('overviewBucketCards');
+      if (bucketContainer) {
+        bucketContainer.innerHTML = '';
+        const sortedBuckets = Object.values(bucketsData).sort((a, b) => b.totalSp - a.totalSp);
+
+        for (const bObj of sortedBuckets) {
+          const bSp = bObj.totalSp;
+          const pct = totalSp > 0 ? ((bSp / totalSp) * 100).toFixed(1) : '0.0';
+          const epicsCount = Object.keys(bObj.epics).length;
+
+          const card = document.createElement('div');
+          card.className = 'team-overview-card';
+          card.innerHTML = `
+            <div class="team-card-top">
+              <span class="team-card-name"><span class="bucket-badge">${escapeHtml(bObj.name)}</span></span>
+              <span class="team-card-effort">${bSp.toFixed(1)} SP</span>
+            </div>
+            <div class="team-share-bar-wrap">
+              <div class="team-share-bar-fill" style="width: ${Math.min(parseFloat(pct), 100)}%; background: linear-gradient(90deg, #818cf8, #c084fc);"></div>
+            </div>
+            <div class="team-card-bottom">
+              <span><strong>${epicsCount}</strong> Epics • <strong>${bObj.totalTickets}</strong> Child Tickets</span>
+              <span class="team-card-pct" style="background: rgba(129, 140, 248, 0.15); color: #a5b4fc;">${pct}%</span>
+            </div>
+          `;
+          card.addEventListener('click', () => focusOnBucket(bObj.name));
+          bucketContainer.appendChild(card);
+        }
+      }
+
+      // Team Breakdown Cards
+      const teamContainer = document.getElementById('overviewTeamCards');
+      if (teamContainer) {
+        teamContainer.innerHTML = '';
+        const sortedTeams = Object.values(teamsData).sort((a, b) => b.totalSp - a.totalSp);
+
+        for (const tObj of sortedTeams) {
+          const tSp = tObj.totalSp;
+          const pct = totalSp > 0 ? ((tSp / totalSp) * 100).toFixed(1) : '0.0';
+          const epicsCount = Object.keys(tObj.epics).length;
+
+          const card = document.createElement('div');
+          card.className = 'team-overview-card';
+          card.innerHTML = `
+            <div class="team-card-top">
+              <span class="team-card-name">${escapeHtml(tObj.name)}</span>
+              <span class="team-card-effort">${tSp.toFixed(1)} SP</span>
+            </div>
+            <div class="team-share-bar-wrap">
+              <div class="team-share-bar-fill" style="width: ${Math.min(parseFloat(pct), 100)}%;"></div>
+            </div>
+            <div class="team-card-bottom">
+              <span><strong>${epicsCount}</strong> Epics • <strong>${tObj.totalTickets}</strong> Child Tickets</span>
+              <span class="team-card-pct">${pct}%</span>
+            </div>
+          `;
+          card.addEventListener('click', () => focusOnTeam(tObj.name));
+          teamContainer.appendChild(card);
+        }
+      }
+    }
+
+    function renderPills() {
+      const container = document.getElementById('teamPills');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = `pill-btn ${activeTeamFilter === 'ALL' ? 'active' : ''}`;
+      allBtn.innerHTML = `All Teams <span class="pill-count">${Object.keys(teamsData).length}</span>`;
+      allBtn.addEventListener('click', () => {
+        activeTeamFilter = 'ALL';
+        renderPills();
+        renderWidgets();
+      });
+      container.appendChild(allBtn);
+
+      const sortedTeams = Object.keys(teamsData).sort();
+      for (const t of sortedTeams) {
+        const btn = document.createElement('button');
+        btn.className = `pill-btn ${activeTeamFilter === t ? 'active' : ''}`;
+        btn.innerHTML = `${escapeHtml(t)} <span class="pill-count">${teamsData[t].totalSp.toFixed(1)} SP</span>`;
+        btn.addEventListener('click', () => {
+          activeTeamFilter = t;
+          teamExpandedStates[t] = true;
+          renderPills();
+          renderWidgets();
+        });
+        container.appendChild(btn);
+      }
+    }
+
+    function renderBucketPills() {
+      const container = document.getElementById('bucketPills');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = `pill-btn ${activeBucketFilter === 'ALL' ? 'active' : ''}`;
+      allBtn.innerHTML = `All Buckets <span class="pill-count">${Object.keys(bucketsData).length}</span>`;
+      allBtn.addEventListener('click', () => {
+        activeBucketFilter = 'ALL';
+        renderBucketPills();
+        renderBucketWidgets();
+      });
+      container.appendChild(allBtn);
+
+      const sortedBuckets = Object.keys(bucketsData).sort();
+      for (const b of sortedBuckets) {
+        const btn = document.createElement('button');
+        btn.className = `pill-btn ${activeBucketFilter === b ? 'active' : ''}`;
+        btn.innerHTML = `${escapeHtml(b)} <span class="pill-count">${bucketsData[b].totalSp.toFixed(1)} SP</span>`;
+        btn.addEventListener('click', () => {
+          activeBucketFilter = b;
+          bucketExpandedStates[b] = true;
+          renderBucketPills();
+          renderBucketWidgets();
+        });
+        container.appendChild(btn);
+      }
+    }
+
+    function getSortedEpics(teamObj, sortKey, sortDir) {
+      const epics = Object.values(teamObj.epics);
+      return epics.sort((a, b) => {
+        let valA = a[sortKey];
+        let valB = b[sortKey];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function getSortedBucketEpics(bucketObj, sortKey, sortDir) {
+      const epics = Object.values(bucketObj.epics);
+      return epics.sort((a, b) => {
+        let valA = a[sortKey];
+        let valB = b[sortKey];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function toggleTeamExpansion(team) {
+      teamExpandedStates[team] = !teamExpandedStates[team];
+      renderWidgets();
+    }
+
+    function toggleBucketExpansion(bucketName) {
+      bucketExpandedStates[bucketName] = !bucketExpandedStates[bucketName];
+      renderBucketWidgets();
+    }
+
+    function toggleEpicChildren(team, epicKey) {
+      const compositeKey = team + '__' + epicKey;
+      epicExpandedStates[compositeKey] = !epicExpandedStates[compositeKey];
+      renderWidgets();
+    }
+
+    function toggleBucketEpicChildren(bucketName, epicKey) {
+      const compositeKey = bucketName + '__' + epicKey;
+      bucketEpicExpandedStates[compositeKey] = !bucketEpicExpandedStates[compositeKey];
+      renderBucketWidgets();
+    }
+
+    function setAllExpansion(expand) {
+      for (const t in teamsData) {
+        teamExpandedStates[t] = expand;
+      }
+      renderWidgets();
+    }
+
+    function setAllBucketExpansion(expand) {
+      for (const b in bucketsData) {
+        bucketExpandedStates[b] = expand;
+      }
+      renderBucketWidgets();
+    }
+
+    function renderWidgets() {
+      const container = document.getElementById('widgetsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const teamsToRender = activeTeamFilter === 'ALL'
+        ? Object.keys(teamsData).sort()
+        : [activeTeamFilter].filter(t => teamsData[t]);
+
+      const q = searchQuery.toLowerCase();
+
+      for (const t of teamsToRender) {
+        const teamObj = teamsData[t];
+        const isExpanded = teamExpandedStates[t] !== false;
+        const sortState = teamSortStates[t] || { key: 'sp', dir: 'desc' };
+
+        const sortedEpics = getSortedEpics(teamObj, sortState.key, sortState.dir);
+        const filteredEpics = sortedEpics.filter(e => {
+          if (!q) return true;
+          if (e.key.toLowerCase().includes(q)) return true;
+          if (e.summary.toLowerCase().includes(q)) return true;
+          if (e.bucket.toLowerCase().includes(q)) return true;
+          return e.children.some(c =>
+            c.key.toLowerCase().includes(q) ||
+            c.summary.toLowerCase().includes(q) ||
+            c.assignee.toLowerCase().includes(q) ||
+            c.sprint.toLowerCase().includes(q)
+          );
+        });
+
+        if (q && filteredEpics.length === 0) continue;
+
+        const widget = document.createElement('div');
+        widget.className = `team-widget ${isExpanded ? 'expanded' : ''}`;
+        widget.id = 'widget-' + t.replace(/\s+/g, '_');
+
+        const header = document.createElement('div');
+        header.className = 'widget-header';
+        header.innerHTML = `
+          <div class="widget-title-group">
+            <svg class="widget-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span class="widget-name">${escapeHtml(t)}</span>
+          </div>
+          <div class="widget-meta">
+            <span class="widget-stat-pill">Epics: <strong>${Object.keys(teamObj.epics).length}</strong></span>
+            <span class="widget-stat-pill">Tickets: <strong>${teamObj.totalTickets}</strong></span>
+            <span class="widget-stat-pill">Effort: <strong>${teamObj.totalSp.toFixed(1)} SP</strong></span>
+          </div>
+        `;
+        header.addEventListener('click', () => toggleTeamExpansion(t));
+        widget.appendChild(header);
+
+        const body = document.createElement('div');
+        body.className = 'widget-body';
+
+        if (filteredEpics.length === 0) {
+          body.innerHTML = '<div class="empty-state">No epics matching current search criteria</div>';
+        } else {
+          const table = document.createElement('table');
+          table.className = 'epics-table';
+
+          const thead = document.createElement('thead');
+          thead.innerHTML = `
+            <tr>
+              <th style="width: 140px;">Epic Key</th>
+              <th>Epic Summary</th>
+              <th style="width: 160px;">Bucket</th>
+              <th style="width: 100px; text-align: center;">Children</th>
+              <th style="width: 110px; text-align: right;">Actual SP</th>
+            </tr>
+          `;
+          table.appendChild(thead);
+
+          const tbody = document.createElement('tbody');
+
+          for (const epic of filteredEpics) {
+            const compositeKey = t + '__' + epic.key;
+            const childrenOpen = !!epicExpandedStates[compositeKey];
+
+            const epicTr = document.createElement('tr');
+            epicTr.className = `epic-row ${childrenOpen ? 'children-open' : ''}`;
+            epicTr.innerHTML = `
+              <td>
+                <div class="epic-key-cell">
+                  <svg class="epic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  <a href="https://ibex-ai.atlassian.net/browse/${epic.key}" class="jira-link" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${epic.key}</a>
+                </div>
+              </td>
+              <td><span class="epic-summary-text">${escapeHtml(epic.summary || '(No summary)')}</span></td>
+              <td><span class="bucket-badge">${escapeHtml(epic.bucket || 'Other')}</span></td>
+              <td style="text-align: center;"><strong>${epic.childCount}</strong></td>
+              <td class="sp-cell">${epic.sp.toFixed(1)}</td>
+            `;
+            epicTr.addEventListener('click', () => toggleEpicChildren(t, epic.key));
+            tbody.appendChild(epicTr);
+
+            const childTr = document.createElement('tr');
+            childTr.className = `children-row ${childrenOpen ? 'open' : ''}`;
+
+            let childRowsHtml = '';
+            for (const c of epic.children) {
+              const childMatch = !q ||
+                c.key.toLowerCase().includes(q) ||
+                c.summary.toLowerCase().includes(q) ||
+                c.assignee.toLowerCase().includes(q) ||
+                c.sprint.toLowerCase().includes(q);
+
+              if (childMatch) {
+                childRowsHtml += `
+                  <tr>
+                    <td style="width: 120px;">
+                      <a href="https://ibex-ai.atlassian.net/browse/${c.key}" class="jira-link" target="_blank" rel="noopener noreferrer">${c.key}</a>
+                    </td>
+                    <td style="width: 75px;"><span class="badge-type ${c.type}">${c.type}</span></td>
+                    <td style="width: 75px;"><span class="badge-status">${c.status}</span></td>
+                    <td>${escapeHtml(c.summary)}</td>
+                    <td style="width: 140px; color: var(--text-muted);">${escapeHtml(c.assignee)}</td>
+                    <td style="width: 140px; color: var(--text-muted); font-size: 11px;">${escapeHtml(c.sprint)}</td>
+                    <td style="width: 70px; text-align: right;" class="sp-cell">${c.sp.toFixed(1)}</td>
+                  </tr>
+                `;
+              }
+            }
+
+            childTr.innerHTML = `
+              <td colspan="5" class="children-container-cell">
+                <table class="children-table">
+                  <thead>
+                    <tr>
+                      <th>Ticket</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Summary</th>
+                      <th>Assignee</th>
+                      <th>Sprint</th>
+                      <th style="text-align: right;">SP</th>
+                    </tr>
+                  </thead>
+                  <tbody>${childRowsHtml}</tbody>
+                </table>
+              </td>
+            `;
+            tbody.appendChild(childTr);
+          }
+
+          table.appendChild(tbody);
+          body.appendChild(table);
+        }
+
+        widget.appendChild(body);
+        container.appendChild(widget);
+      }
+    }
+
+    function renderBucketWidgets() {
+      const container = document.getElementById('bucketWidgetsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const bucketsToRender = activeBucketFilter === 'ALL'
+        ? Object.keys(bucketsData).sort()
+        : [activeBucketFilter].filter(b => bucketsData[b]);
+
+      const q = searchQuery.toLowerCase();
+
+      for (const b of bucketsToRender) {
+        const bucketObj = bucketsData[b];
+        const isExpanded = bucketExpandedStates[b] !== false;
+        const sortState = bucketSortStates[b] || { key: 'sp', dir: 'desc' };
+
+        const sortedEpics = getSortedBucketEpics(bucketObj, sortState.key, sortState.dir);
+        const filteredEpics = sortedEpics.filter(e => {
+          if (!q) return true;
+          if (e.key.toLowerCase().includes(q)) return true;
+          if (e.summary.toLowerCase().includes(q)) return true;
+          return e.children.some(c =>
+            c.key.toLowerCase().includes(q) ||
+            c.summary.toLowerCase().includes(q) ||
+            c.assignee.toLowerCase().includes(q) ||
+            c.sprint.toLowerCase().includes(q) ||
+            c.team.toLowerCase().includes(q)
+          );
+        });
+
+        if (q && filteredEpics.length === 0) continue;
+
+        const widget = document.createElement('div');
+        widget.className = `team-widget ${isExpanded ? 'expanded' : ''}`;
+        widget.id = 'widget-bucket-' + b.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        const header = document.createElement('div');
+        header.className = 'widget-header';
+        header.innerHTML = `
+          <div class="widget-title-group">
+            <svg class="widget-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span class="widget-name"><span class="bucket-badge" style="font-size: 13px;">${escapeHtml(b)}</span></span>
+          </div>
+          <div class="widget-meta">
+            <span class="widget-stat-pill">Epics: <strong>${Object.keys(bucketObj.epics).length}</strong></span>
+            <span class="widget-stat-pill">Tickets: <strong>${bucketObj.totalTickets}</strong></span>
+            <span class="widget-stat-pill">Effort: <strong>${bucketObj.totalSp.toFixed(1)} SP</strong></span>
+          </div>
+        `;
+        header.addEventListener('click', () => toggleBucketExpansion(b));
+        widget.appendChild(header);
+
+        const body = document.createElement('div');
+        body.className = 'widget-body';
+
+        if (filteredEpics.length === 0) {
+          body.innerHTML = '<div class="empty-state">No epics matching current search criteria</div>';
+        } else {
+          const table = document.createElement('table');
+          table.className = 'epics-table';
+
+          const thead = document.createElement('thead');
+          thead.innerHTML = `
+            <tr>
+              <th style="width: 140px;">Epic Key</th>
+              <th>Epic Summary</th>
+              <th style="width: 160px;">Contributing Teams</th>
+              <th style="width: 100px; text-align: center;">Children</th>
+              <th style="width: 110px; text-align: right;">Actual SP</th>
+            </tr>
+          `;
+          table.appendChild(thead);
+
+          const tbody = document.createElement('tbody');
+
+          for (const epic of filteredEpics) {
+            const compositeKey = b + '__' + epic.key;
+            const childrenOpen = !!bucketEpicExpandedStates[compositeKey];
+
+            const epicTr = document.createElement('tr');
+            epicTr.className = `epic-row ${childrenOpen ? 'children-open' : ''}`;
+            const teamsListStr = Array.from(epic.teams).join(', ');
+
+            epicTr.innerHTML = `
+              <td>
+                <div class="epic-key-cell">
+                  <svg class="epic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  <a href="https://ibex-ai.atlassian.net/browse/${epic.key}" class="jira-link" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${epic.key}</a>
+                </div>
+              </td>
+              <td><span class="epic-summary-text">${escapeHtml(epic.summary || '(No summary)')}</span></td>
+              <td><span style="font-size: 11.5px; color: var(--text-muted);">${escapeHtml(teamsListStr)}</span></td>
+              <td style="text-align: center;"><strong>${epic.childCount}</strong></td>
+              <td class="sp-cell">${epic.sp.toFixed(1)}</td>
+            `;
+            epicTr.addEventListener('click', () => toggleBucketEpicChildren(b, epic.key));
+            tbody.appendChild(epicTr);
+
+            const childTr = document.createElement('tr');
+            childTr.className = `children-row ${childrenOpen ? 'open' : ''}`;
+
+            let childRowsHtml = '';
+            for (const c of epic.children) {
+              const childMatch = !q ||
+                c.key.toLowerCase().includes(q) ||
+                c.summary.toLowerCase().includes(q) ||
+                c.assignee.toLowerCase().includes(q) ||
+                c.sprint.toLowerCase().includes(q) ||
+                c.team.toLowerCase().includes(q);
+
+              if (childMatch) {
+                childRowsHtml += `
+                  <tr>
+                    <td style="width: 120px;">
+                      <a href="https://ibex-ai.atlassian.net/browse/${c.key}" class="jira-link" target="_blank" rel="noopener noreferrer">${c.key}</a>
+                    </td>
+                    <td style="width: 75px;"><span class="badge-type ${c.type}">${c.type}</span></td>
+                    <td style="width: 90px; color: var(--text-muted); font-weight: 600;">${escapeHtml(c.team)}</td>
+                    <td>${escapeHtml(c.summary)}</td>
+                    <td style="width: 140px; color: var(--text-muted);">${escapeHtml(c.assignee)}</td>
+                    <td style="width: 140px; color: var(--text-muted); font-size: 11px;">${escapeHtml(c.sprint)}</td>
+                    <td style="width: 70px; text-align: right;" class="sp-cell">${c.sp.toFixed(1)}</td>
+                  </tr>
+                `;
+              }
+            }
+
+            childTr.innerHTML = `
+              <td colspan="5" class="children-container-cell">
+                <table class="children-table">
+                  <thead>
+                    <tr>
+                      <th>Ticket</th>
+                      <th>Type</th>
+                      <th>Team</th>
+                      <th>Summary</th>
+                      <th>Assignee</th>
+                      <th>Sprint</th>
+                      <th style="text-align: right;">SP</th>
+                    </tr>
+                  </thead>
+                  <tbody>${childRowsHtml}</tbody>
+                </table>
+              </td>
+            `;
+            tbody.appendChild(childTr);
+          }
+
+          table.appendChild(tbody);
+          body.appendChild(table);
+        }
+
+        widget.appendChild(body);
+        container.appendChild(widget);
+      }
+    }
+
+    // Load data handler
+    function onDataReceived(payload) {
+      hideError();
+      currentQuarter = payload.quarter || currentQuarter;
+      const displayQuarter = currentQuarter.replace('_', ' ');
+
+      document.getElementById('dashboardQuarterTitle').textContent = displayQuarter;
+      document.getElementById('badgeQuarterText').textContent = currentQuarter.replace('2026_', '26') + ' Actuals';
+      const subLabels = document.querySelectorAll('.lblQuarterSubtext');
+      subLabels.forEach(el => el.textContent = displayQuarter);
+
+      const cacheBadge = document.getElementById('badgeCacheStatus');
+      if (payload.fromCache) {
+        cacheBadge.className = 'badge-status-pill badge-status-cache';
+        cacheBadge.textContent = 'Cached (1h)';
+      } else {
+        cacheBadge.className = 'badge-status-pill badge-status-live';
+        cacheBadge.textContent = 'Live Data';
+      }
+
+      if (payload.lastUpdated) {
+        const d = new Date(payload.lastUpdated);
+        document.getElementById('lblLastUpdated').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + d.toLocaleDateString() + ')';
+      }
+
+      const processed = processRows(payload.rows || []);
+      teamsData = processed.teams;
+      bucketsData = processed.buckets;
+
+      renderSummary();
+      renderPills();
+      renderBucketPills();
+      renderWidgets();
+      renderBucketWidgets();
+    }
+
+    function fetchQuarterData(quarterKey, forceRefresh) {
+      showLoading(true, `Querying Jira Cloud for ${quarterKey.replace('_', ' ')} sprints and actuals...`);
+      const refreshIcon = document.getElementById('refreshIcon');
+      if (forceRefresh && refreshIcon) refreshIcon.classList.add('rotating');
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            showLoading(false);
+            if (refreshIcon) refreshIcon.classList.remove('rotating');
+            onDataReceived(response);
+          })
+          .withFailureHandler(function(err) {
+            showLoading(false);
+            if (refreshIcon) refreshIcon.classList.remove('rotating');
+            showError('Failed to load quarterly actuals from Jira: ' + (err.message || err));
+          })
+          .apiGetQuarterlyActuals(quarterKey, !!forceRefresh);
+      } else {
+        // Local test fallback
+        showLoading(false);
+        if (refreshIcon) refreshIcon.classList.remove('rotating');
+        showError('Google Apps Script runtime (google.script.run) not available in local preview.');
+      }
+    }
+
+    function setupListeners() {
+      // Quarter Selector
+      const qSelect = document.getElementById('quarterSelect');
+      if (qSelect) {
+        qSelect.addEventListener('change', (e) => {
+          currentQuarter = e.target.value;
+          fetchQuarterData(currentQuarter, false);
+        });
+      }
+
+      // Refresh Live
+      const btnRefresh = document.getElementById('btnRefreshLive');
+      if (btnRefresh) {
+        btnRefresh.addEventListener('click', () => {
+          fetchQuarterData(currentQuarter, true);
+        });
+      }
+
+      // Theme toggle
+      const btnTheme = document.getElementById('btnThemeToggle');
+      if (btnTheme) {
+        btnTheme.addEventListener('click', toggleTheme);
+      }
+
+      // Retry button
+      const btnRetry = document.getElementById('btnRetry');
+      if (btnRetry) {
+        btnRetry.addEventListener('click', () => {
+          fetchQuarterData(currentQuarter, true);
+        });
+      }
+
+      // Jira info callout toggle
+      const jiraHeader = document.getElementById('jiraInfoHeader');
+      if (jiraHeader) {
+        jiraHeader.addEventListener('click', () => {
+          const callout = document.getElementById('jiraInfoCallout');
+          const hint = document.getElementById('jiraInfoHint');
+          callout.classList.toggle('open');
+          hint.textContent = callout.classList.contains('open') ? 'Click to collapse' : 'Click to expand';
+        });
+      }
+
+      // Search input
+      const searchInput = document.getElementById('globalSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          searchQuery = e.target.value.trim();
+          renderWidgets();
+          renderBucketWidgets();
+        });
+      }
+
+      // Expand/Collapse Buttons
+      const btnExp = document.getElementById('btnExpandAll');
+      if (btnExp) btnExp.addEventListener('click', () => setAllExpansion(true));
+
+      const btnCol = document.getElementById('btnCollapseAll');
+      if (btnCol) btnCol.addEventListener('click', () => setAllExpansion(false));
+
+      const btnExpB = document.getElementById('btnExpandAllBuckets');
+      if (btnExpB) btnExpB.addEventListener('click', () => setAllBucketExpansion(true));
+
+      const btnColB = document.getElementById('btnCollapseAllBuckets');
+      if (btnColB) btnColB.addEventListener('click', () => setAllBucketExpansion(false));
+    }
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      setupListeners();
+      fetchQuarterData('2026_Q3', false);
+    });
+  </script>
+</body>
+</html>

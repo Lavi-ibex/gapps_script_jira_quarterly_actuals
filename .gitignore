@@ -1,0 +1,21 @@
+# Local Apps Script and clasp credentials
+.clasprc.json
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.token
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/
