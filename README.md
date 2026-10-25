@@ -2,6 +2,7 @@
 
 A lightweight, secure, responsive, and themeable Google Apps Script web app for viewing and analyzing Quarterly Planning actual effort (Story Points) across all Ibex engineering and cross-functional teams.
 
+- **Google Sites Portal:** [Ibex PPM Delivery Hub](https://sites.google.com/ibex-ai.com/ibex-ppm-delivery-hub/quarterly-actuals)
 - **Live Web App:** [Open Web App](https://script.google.com/a/macros/ibex-ai.com/s/AKfycbzdd-yRObJ2BBcI4gmBL3NUdIqg7zL6uimjxrjvhygvaGkndy22hlPtL43gFtYrIqrbqg/exec)
 - **GitHub Repository:** https://github.com/Lavi-ibex/gapps_script_jira_quarterly_actuals
 - **Google Apps Script IDE:** [Project Editor](https://script.google.com/d/1FoLe-xnmAfSh9p2E_1-5DeeE6Otz6lVFqVwhlmBEDuVFOPDVH-RZBaXi/edit)
