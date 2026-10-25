@@ -136,9 +136,9 @@ function getCachedJson(baseKey) {
  */
 function jiraFetch(endpoint, method, payload) {
   var scriptProps = PropertiesService.getScriptProperties();
-  var baseUrl = (scriptProps.getProperty('JIRA_BASE_URL') || 'https://ibex-ai.atlassian.net').replace(/\/+$/, '');
-  var userEmail = scriptProps.getProperty('JIRA_USER_EMAIL');
-  var apiToken = scriptProps.getProperty('JIRA_API_TOKEN');
+  var baseUrl = (scriptProps.getProperty('JIRA_BASE_URL') || 'https://ibex-ai.atlassian.net').trim().replace(/\/+$/, '');
+  var userEmail = (scriptProps.getProperty('JIRA_USER_EMAIL') || scriptProps.getProperty('JIRA_EMAIL') || '').trim();
+  var apiToken = (scriptProps.getProperty('JIRA_API_TOKEN') || scriptProps.getProperty('JIRA_TOKEN') || '').trim();
 
   if (!userEmail || !apiToken) {
     throw new Error('Jira credentials (JIRA_USER_EMAIL and JIRA_API_TOKEN) are not configured in Script Properties.');
@@ -147,7 +147,6 @@ function jiraFetch(endpoint, method, payload) {
   var authHeader = 'Basic ' + Utilities.base64Encode(userEmail + ':' + apiToken);
   var options = {
     method: method || 'get',
-    contentType: 'application/json',
     headers: {
       'Authorization': authHeader,
       'Accept': 'application/json'
@@ -156,6 +155,7 @@ function jiraFetch(endpoint, method, payload) {
   };
 
   if (payload) {
+    options.contentType = 'application/json';
     options.payload = JSON.stringify(payload);
   }
 
@@ -447,4 +447,16 @@ function fetchQuarterlyDataFromJira(quarterKey) {
     totalIssues: rows.length,
     rows: rows
   };
+}
+
+/**
+ * Diagnostic helper to test Jira Cloud credentials.
+ */
+function apiTestJiraConnection() {
+  try {
+    var user = jiraFetch('/rest/api/3/myself', 'get');
+    return { success: true, user: user.displayName || user.emailAddress };
+  } catch (err) {
+    return { success: false, error: err.toString() };
+  }
 }

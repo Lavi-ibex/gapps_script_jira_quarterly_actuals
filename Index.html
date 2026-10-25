@@ -6,10 +6,10 @@
   <title>Ibex Quarterly Actual Effort Dashboard</title>
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #0b1120;
       --surface: #1e293b;
       --surface-light: #334155;
-      --border: #475569;
+      --border: #334155;
       --border-subtle: rgba(255, 255, 255, 0.08);
       --text: #f8fafc;
       --text-muted: #94a3b8;
@@ -22,7 +22,7 @@
       --card-bg: #1e293b;
       --table-stripe: rgba(255, 255, 255, 0.02);
       --table-hover: rgba(56, 189, 248, 0.08);
-      --nested-bg: #0b1120;
+      --nested-bg: #0f172a;
       --radius: 10px;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -32,8 +32,8 @@
       --bg: #f8fafc;
       --surface: #ffffff;
       --surface-light: #f1f5f9;
-      --border: #cbd5e1;
-      --border-subtle: #e2e8f0;
+      --border: #e2e8f0;
+      --border-subtle: #f1f5f9;
       --text: #0f172a;
       --text-muted: #64748b;
       --primary: #0284c7;
@@ -45,7 +45,7 @@
       --card-bg: #ffffff;
       --table-stripe: rgba(0, 0, 0, 0.02);
       --table-hover: rgba(2, 132, 199, 0.06);
-      --nested-bg: #f1f5f9;
+      --nested-bg: #f8fafc;
     }
 
     * {
@@ -1041,8 +1041,8 @@
           </button>
 
           <!-- Theme Toggle Button -->
-          <button class="btn btn-icon" id="btnThemeToggle" type="button" title="Toggle Dark/Light Mode">
-            <span id="themeIcon">☀️</span>
+          <button class="btn" id="btnThemeToggle" type="button" title="Toggle Dark/Light Mode">
+            <span id="themeIcon">☀️</span> <span id="themeLabel">Light Mode</span>
           </button>
         </div>
       </div>
@@ -1212,20 +1212,27 @@
 
     // Theme Management
     function initTheme() {
-      const savedTheme = localStorage.getItem('ibex-actuals-theme');
-      if (savedTheme === 'light') {
+      const savedTheme = localStorage.getItem('ibex_theme') || localStorage.getItem('ibex-actuals-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
         document.body.classList.add('theme-light');
         document.getElementById('themeIcon').textContent = '🌙';
+        const lbl = document.getElementById('themeLabel');
+        if (lbl) lbl.textContent = 'Dark Mode';
       } else {
         document.body.classList.remove('theme-light');
         document.getElementById('themeIcon').textContent = '☀️';
+        const lbl = document.getElementById('themeLabel');
+        if (lbl) lbl.textContent = 'Light Mode';
       }
     }
 
     function toggleTheme() {
       const isLight = document.body.classList.toggle('theme-light');
-      localStorage.setItem('ibex-actuals-theme', isLight ? 'light' : 'dark');
+      localStorage.setItem('ibex_theme', isLight ? 'light' : 'dark');
       document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+      const lbl = document.getElementById('themeLabel');
+      if (lbl) lbl.textContent = isLight ? 'Dark Mode' : 'Light Mode';
     }
 
     // UI Loading state
