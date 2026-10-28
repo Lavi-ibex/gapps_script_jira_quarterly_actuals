@@ -38,7 +38,7 @@ function doGet(e) {
  * @returns {Object} Quarterly actuals payload.
  */
 function apiGetQuarterlyActuals(quarterKey, forceRefresh) {
-  var target = (quarterKey || '2026_Q3').trim().toUpperCase();
+  var target = (quarterKey || '2026_Q4').trim().toUpperCase();
   // Normalize format e.g. 26Q3 -> 2026_Q3
   if (/^26Q[1-4]$/.test(target)) {
     target = '20' + target.substring(0, 2) + '_' + target.substring(2);
@@ -459,4 +459,142 @@ function apiTestJiraConnection() {
   } catch (err) {
     return { success: false, error: err.toString() };
   }
+}
+
+/** Parentless-item audit. Independent of completed Actuals rows and their cache. */
+function apiGetQuarterOrphans(quarterKey, forceRefresh) {
+  var quarter = validateOrphanQuarter_(quarterKey);
+  var key = 'IBEX_ORPHANS_V1_' + quarter;
+  if (!forceRefresh) {
+    var cached = getCachedJson(key);
+    if (cached && cached.complete === true && cached.quarter === quarter && Array.isArray(cached.items)) {
+      cached.fromCache = true;
+      return cached;
+    }
+  }
+  try {
+    var result = fetchQuarterOrphans_(quarter);
+    result.fromCache = false;
+    try { putCachedJson(key, result, CACHE_EXPIRATION_SECONDS); } catch (cacheError) { /* Fresh results remain usable. */ }
+    return result;
+  } catch (auditError) {
+    // Do not expose Jira response bodies or credentials in client errors.
+    var status = String(auditError && auditError.message || '').match(/Jira API error \((\d+)\)/);
+    var category = status ? 'JIRA_' + status[1] : (/^[A-Za-z]+$/.test(auditError && auditError.name || '') ? auditError.name : 'AUDIT_ERROR');
+    return {quarter: quarter, complete: false, failureCode: category, error: 'The items audit could not finish. Retry to load a complete result.'};
+  }
+}
+
+function validateOrphanQuarter_(value) {
+  if (typeof value !== 'string') { throw new Error('Select a supported quarter.'); }
+  var match = value.trim().toUpperCase().match(/^(?:20)?(\d{2})[_\s-]?Q([1-4])$/);
+  var quarter = match ? '20' + match[1] + '_Q' + match[2] : '';
+  if (SUPPORTED_QUARTERS.indexOf(quarter) === -1) { throw new Error('Select a supported quarter.'); }
+  return quarter;
+}
+
+function orphanQuarterBounds_(quarter) {
+  var year = Number(quarter.substring(0, 4));
+  var number = Number(quarter.substring(6));
+  var startMonth = (number - 1) * 3 + 1;
+  var nextYear = number === 4 ? year + 1 : year;
+  var nextMonth = number === 4 ? 1 : startMonth + 3;
+  function date(y, m) { return y + '-' + ('0' + m).slice(-2) + '-01'; }
+  return {start: date(year, startMonth), end: date(nextYear, nextMonth)};
+}
+
+function fetchOrphanSearchPages_(jql, fields, deadline) {
+  var issues = [], next = null, tokens = Object.create(null);
+  for (var page = 0; page < 100; page++) {
+    if (Date.now() >= deadline) { throw new Error('Incomplete audit: execution budget reached.'); }
+    var request = {jql: jql, fields: fields, maxResults: 100};
+    if (next) { request.nextPageToken = next; }
+    var response = jiraFetch('/rest/api/3/search/jql', 'post', request);
+    if (!response || !Array.isArray(response.issues)) { throw new Error('Incomplete audit: invalid search response.'); }
+    issues = issues.concat(response.issues);
+    if (response.isLast === true) { return issues; }
+    var token = response.nextPageToken;
+    if (typeof token !== 'string' || !token) {
+      if (response.isLast === false || response.issues.length >= 100) { throw new Error('Incomplete audit: missing search cursor.'); }
+      return issues;
+    }
+    if (tokens[token]) { throw new Error('Incomplete audit: repeated search cursor.'); }
+    tokens[token] = true;
+    next = token;
+  }
+  throw new Error('Incomplete audit: page limit reached.');
+}
+
+function orphanSprintNames_(raw) {
+  if (!Array.isArray(raw)) { return []; }
+  var seen = Object.create(null);
+  return raw.map(function (sprint) {
+    if (sprint && typeof sprint === 'object') { return typeof sprint.name === 'string' ? sprint.name : ''; }
+    if (typeof sprint === 'string') {
+      var match = sprint.match(/name=([^,\]]+)/);
+      return match ? match[1].trim() : sprint;
+    }
+    return '';
+  }).filter(function (name) { if (!name || seen[name]) { return false; } seen[name] = true; return true; });
+}
+
+function orphanPersonName_(fields, key) {
+  if (fields[key] === null) { return 'Unassigned'; }
+  var person = fields[key];
+  return person && typeof person.displayName === 'string' && person.displayName ? person.displayName : 'Unavailable';
+}
+
+function orphanStoryPoints_(fields) {
+  var value = fields[STORY_POINTS_FIELD_ID];
+  if (value === null || value === undefined) { value = fields.customfield_10746; }
+  if (typeof value === 'number') { return isFinite(value) ? value : null; }
+  if (typeof value === 'string' && /^-?\d+(?:\.\d+)?$/.test(value.trim())) { return Number(value); }
+  return null;
+}
+
+function fetchQuarterOrphans_(quarter) {
+  var bounds = orphanQuarterBounds_(quarter);
+  var pattern = new RegExp('(?:20)?' + quarter.substring(2, 4) + '[\\s_-]?Q' + quarter.substring(6) + '(?![0-9])', 'i');
+  var fields = ['key', 'summary', 'issuetype', 'status', 'parent', 'assignee', 'reporter', 'created',
+    STORY_POINTS_FIELD_ID, 'customfield_10746', SPRINT_FIELD_ID, TEAM_FIELD_ID, ITEAM_FIELD_ID];
+  var deadline = Date.now() + 150000;
+  var sprintItems = fetchOrphanSearchPages_('project = IBX AND issuetype in standardIssueTypes() AND issuetype != Epic AND parent is EMPTY AND sprint is not EMPTY ORDER BY key DESC', fields, deadline);
+  var pathoItems = fetchOrphanSearchPages_('project = IBX AND issuetype = "Patho Task" AND parent is EMPTY AND created >= "' + bounds.start + '" AND created < "' + bounds.end + '" ORDER BY key DESC', fields, deadline);
+  var byKey = Object.create(null);
+  function include(issue, createdInQuarter) {
+    var f = issue && issue.fields;
+    var type = f && f.issuetype;
+    if (!f || !/^IBX-\d+$/.test(issue.key || '') || f.parent || !type || type.subtask || /^(epic|sub-task|subtask)$/i.test(type.name || '')) { return; }
+    var matching = orphanSprintNames_(f[SPRINT_FIELD_ID]).filter(function (name) { return pattern.test(name); }).sort();
+    if (createdInQuarter && type.name !== 'Patho Task') { return; }
+    if (!createdInQuarter && !matching.length) { return; }
+    var item = byKey[issue.key];
+    if (!item) {
+      item = {key: issue.key, summary: typeof f.summary === 'string' ? f.summary : '', type: type.name || 'Unavailable',
+        status: f.status && f.status.name || 'Unavailable', assignee: orphanPersonName_(f, 'assignee'), reporter: orphanPersonName_(f, 'reporter'),
+        storyPoints: orphanStoryPoints_(f), team: normalizeTeam(f), sprints: matching,
+        pathoCreatedInQuarter: false, created: typeof f.created === 'string' ? f.created : ''};
+      byKey[issue.key] = item;
+    } else {
+      matching.forEach(function (name) { if (item.sprints.indexOf(name) === -1) { item.sprints.push(name); } });
+      item.sprints.sort();
+    }
+    if (createdInQuarter) { item.pathoCreatedInQuarter = true; }
+  }
+  sprintItems.forEach(function (issue) { include(issue, false); });
+  pathoItems.forEach(function (issue) { include(issue, true); });
+  var items = Object.keys(byKey).map(function (key) { return byKey[key]; });
+  items.sort(function (a, b) { return a.team.localeCompare(b.team) || a.sprints.join(', ').localeCompare(b.sprints.join(', ')) || a.key.localeCompare(b.key); });
+  var teams = Object.create(null), total = 0;
+  items.forEach(function (item) {
+    if (!teams[item.team]) { teams[item.team] = {team: item.team, count: 0, storyPoints: 0}; }
+    teams[item.team].count++;
+    if (item.storyPoints !== null) { teams[item.team].storyPoints += item.storyPoints; total += item.storyPoints; }
+  });
+  var summary = Object.keys(teams).sort(function (a, b) { return a.localeCompare(b); }).map(function (key) {
+    teams[key].storyPoints = Math.round(teams[key].storyPoints * 1000000) / 1000000;
+    return teams[key];
+  });
+  return {quarter: quarter, complete: true, count: items.length, storyPoints: Math.round(total * 1000000) / 1000000,
+    teams: summary, items: items, lastUpdated: new Date().toISOString()};
 }

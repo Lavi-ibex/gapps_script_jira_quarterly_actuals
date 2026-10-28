@@ -3,51 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ibex Quarterly Actual Effort Dashboard</title>
+  <title>Quarterly Actuals</title>
   <style>
     :root {
-      --bg: #0b1120;
-      --surface: #1e293b;
-      --surface-light: #334155;
-      --border: #334155;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-hover: #0ea5e9;
-      --accent: #818cf8;
-      --success: #34d399;
-      --warning: #fbbf24;
-      --danger: #f87171;
-      --card-bg: #1e293b;
-      --table-stripe: rgba(255, 255, 255, 0.02);
-      --table-hover: rgba(56, 189, 248, 0.08);
-      --nested-bg: #0f172a;
-      --logo-text-color: #ffffff;
+      --bg: var(--ibex-canvas);
+      --surface: var(--ibex-surface);
+      --surface-light: var(--ibex-inset);
+      --border: var(--ibex-border);
+      --border-subtle: var(--ibex-border);
+      --text: var(--ibex-text);
+      --text-muted: var(--ibex-muted);
+      --primary: var(--ibex-strong);
+      --primary-hover: var(--ibex-secondary);
+      --accent: var(--ibex-purple-text);
+      --success: var(--ibex-green-text);
+      --warning: var(--ibex-amber-text);
+      --danger: var(--ibex-red-text);
+      --card-bg: var(--ibex-surface);
+      --table-stripe: var(--ibex-table-even);
+      --table-hover: var(--ibex-callout);
+      --nested-bg: var(--ibex-inset);
+      --logo-text-color: var(--ibex-logo);
       --radius: 10px;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body.theme-light {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --surface-light: #f1f5f9;
-      --border: #e2e8f0;
-      --border-subtle: #f1f5f9;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --primary: #0284c7;
-      --primary-hover: #0369a1;
-      --accent: #6366f1;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --card-bg: #ffffff;
-      --table-stripe: rgba(0, 0, 0, 0.02);
-      --table-hover: rgba(2, 132, 199, 0.06);
-      --nested-bg: #f8fafc;
-      --logo-text-color: #0f172a;
+      --bg: var(--ibex-canvas);
+      --surface: var(--ibex-surface);
+      --surface-light: var(--ibex-inset);
+      --border: var(--ibex-border);
+      --border-subtle: var(--ibex-border);
+      --text: var(--ibex-text);
+      --text-muted: var(--ibex-muted);
+      --primary: var(--ibex-strong);
+      --primary-hover: var(--ibex-secondary);
+      --accent: var(--ibex-purple-text);
+      --success: var(--ibex-green-text);
+      --warning: var(--ibex-amber-text);
+      --danger: var(--ibex-red-text);
+      --card-bg: var(--ibex-surface);
+      --table-stripe: var(--ibex-table-even);
+      --table-hover: var(--ibex-callout);
+      --nested-bg: var(--ibex-inset);
+      --logo-text-color: var(--ibex-logo);
     }
 
     * {
@@ -159,23 +159,30 @@
     .badge-quarter {
       font-size: 13px;
       font-weight: 600;
-      background: rgba(56, 189, 248, 0.15);
+      background: var(--ibex-blue-bg);
       color: var(--primary);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid var(--ibex-blue-text);
       padding: 2px 10px;
       border-radius: 999px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .source-info-bar {
+    .content-header {
       margin-top: 6px;
-      font-size: 13px;
+    }
+
+    .content-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .content-header p {
+      margin-top: 4px;
       color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      font-size: 14px;
     }
 
     .header-actions {
@@ -185,37 +192,48 @@
       flex-wrap: wrap;
     }
 
-    /* Quarter selector select styling */
-    .quarter-select-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-    }
-
-    .quarter-select-label {
-      font-size: 12px;
-      font-weight: 600;
+    .header-last-updated {
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .quarter-select {
-      background: transparent;
-      color: var(--text);
-      border: none;
       font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      outline: none;
+      white-space: nowrap;
     }
 
-    .quarter-select option {
+    /* Quarter selector tabs */
+    .quarter-nav {
+      display: flex;
+      align-items: center;
+      background: var(--border-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      overflow-x: auto;
+    }
+
+    .quarter-tab {
+      appearance: none;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .quarter-tab[aria-pressed="true"] {
       background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quarter-tab:hover:not([aria-pressed="true"]) {
       color: var(--text);
     }
 
@@ -241,13 +259,13 @@
     }
 
     .btn-primary {
-      background: #0284c7;
-      border-color: #0369a1;
-      color: #fff;
+      background: var(--ibex-primary);
+      border-color: var(--ibex-primary);
+      color: var(--ibex-button-text);
     }
 
     .btn-primary:hover {
-      background: #0369a1;
+      background: var(--ibex-primary);
     }
 
     .btn-icon {
@@ -275,24 +293,24 @@
     }
 
     .badge-status-live {
-      background: rgba(52, 211, 153, 0.15);
+      background: var(--ibex-green-bg);
       color: var(--success);
-      border: 1px solid rgba(52, 211, 153, 0.3);
+      border: 1px solid var(--ibex-green-text);
     }
 
     .badge-status-cache {
-      background: rgba(56, 189, 248, 0.15);
+      background: var(--ibex-blue-bg);
       color: var(--primary);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid var(--ibex-blue-text);
     }
 
     /* Error Banner */
     .error-banner {
-      background: rgba(248, 113, 113, 0.15);
-      border: 1px solid rgba(248, 113, 113, 0.4);
+      background: var(--ibex-red-bg);
+      border: 1px solid var(--ibex-red-text);
       border-radius: 8px;
       padding: 14px 18px;
-      color: #fca5a5;
+      color: var(--ibex-red-text);
       font-size: 13.5px;
       display: none;
       align-items: center;
@@ -305,7 +323,7 @@
     .loading-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.7);
+      background: var(--ibex-inset);
       backdrop-filter: blur(3px);
       z-index: 9998;
       display: none;
@@ -318,14 +336,14 @@
     .loading-spinner {
       width: 48px;
       height: 48px;
-      border: 4px solid rgba(56, 189, 248, 0.2);
+      border: 4px solid var(--ibex-blue-text);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
 
     .loading-text {
-      color: #fff;
+      color: var(--ibex-button-text);
       font-size: 15px;
       font-weight: 600;
     }
@@ -442,7 +460,7 @@
     }
 
     .team-share-bar-wrap {
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--ibex-inset);
       height: 6px;
       border-radius: 3px;
       overflow: hidden;
@@ -451,7 +469,7 @@
     .team-share-bar-fill {
       height: 100%;
       border-radius: 3px;
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      background: linear-gradient(90deg, var(--ibex-blue-bg), var(--ibex-purple-bg));
     }
 
     .team-card-bottom {
@@ -466,14 +484,14 @@
       font-weight: 600;
       padding: 2px 6px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.15);
+      background: var(--ibex-blue-bg);
       color: var(--primary);
     }
 
     /* Jira Info Callout */
     .jira-info-callout {
       background: var(--surface-light);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      border: 1px solid var(--ibex-blue-text);
       border-left: 4px solid var(--primary);
       border-radius: 8px;
       padding: 12px 18px;
@@ -532,7 +550,7 @@
     }
 
     .jira-info-body code {
-      background: rgba(0, 0, 0, 0.25);
+      background: var(--ibex-inset);
       padding: 1px 5px;
       border-radius: 4px;
       color: var(--text);
@@ -618,7 +636,7 @@
 
     .pill-btn.active {
       background: var(--primary);
-      color: #fff;
+      color: var(--ibex-button-text);
       border-color: var(--primary);
     }
 
@@ -626,7 +644,7 @@
       font-size: 10.5px;
       padding: 1px 6px;
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--ibex-inset);
     }
 
     /* Widgets Container */
@@ -700,7 +718,7 @@
       gap: 6px;
       padding: 3px 10px;
       border-radius: 6px;
-      background: rgba(0, 0, 0, 0.15);
+      background: var(--ibex-inset);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
       font-size: 12px;
@@ -729,7 +747,7 @@
     }
 
     table.epics-table thead th {
-      background: rgba(0, 0, 0, 0.1);
+      background: var(--ibex-inset);
       padding: 10px 16px;
       text-align: left;
       font-weight: 600;
@@ -864,27 +882,27 @@
     }
 
     .badge-type.Story {
-      background: rgba(56, 189, 248, 0.15);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: var(--ibex-blue-bg);
+      color: var(--ibex-blue-text);
+      border: 1px solid var(--ibex-blue-text);
     }
 
     .badge-type.Bug {
-      background: rgba(248, 113, 113, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(248, 113, 113, 0.3);
+      background: var(--ibex-red-bg);
+      color: var(--ibex-red-text);
+      border: 1px solid var(--ibex-red-text);
     }
 
     .badge-type.Task {
-      background: rgba(52, 211, 153, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(52, 211, 153, 0.3);
+      background: var(--ibex-green-bg);
+      color: var(--ibex-green-text);
+      border: 1px solid var(--ibex-green-text);
     }
 
     .badge-status {
       font-size: 11px;
       color: var(--text-muted);
-      background: rgba(0, 0, 0, 0.15);
+      background: var(--ibex-inset);
       padding: 2px 7px;
       border-radius: 4px;
     }
@@ -895,23 +913,23 @@
       font-size: 11px;
       font-weight: 600;
       border-radius: 6px;
-      background: rgba(129, 140, 248, 0.15);
-      color: #c7d2fe;
-      border: 1px solid rgba(129, 140, 248, 0.3);
+      background: var(--ibex-purple-bg);
+      color: var(--ibex-purple-text);
+      border: 1px solid var(--ibex-purple-text);
       white-space: nowrap;
     }
 
     .bucket-badge.bucket-none {
-      background: rgba(148, 163, 184, 0.08);
+      background: var(--ibex-inset);
       color: var(--text-muted);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      border: 1px solid var(--ibex-border);
     }
 
     /* Drag Target */
     .drag-target {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.92);
+      background: var(--ibex-inset);
       border: 3px dashed var(--primary);
       display: none;
       align-items: center;
@@ -931,7 +949,7 @@
 
     .drag-target-inner h2 {
       font-size: 28px;
-      color: #fff;
+      color: var(--ibex-button-text);
       margin-bottom: 8px;
     }
 
@@ -966,8 +984,539 @@
       }
     }
   </style>
+<style id="ibex-shared-styles" data-version="1.2.0">
+/* Ibex Hub design system 1.2.0. Palette: lavi-html-presentations-revealjs/SKILL.md. */
+:root {
+  --ibex-canvas: #F8FAFC;
+  --ibex-divider: #EDF2F7;
+  --ibex-surface: #FFFFFF;
+  --ibex-raised: #EDF2F7;
+  --ibex-inset: #F1F5F9;
+  --ibex-border: #CBD5E1;
+  --ibex-heading: #0C4DA2;
+  --ibex-text: #1E293B;
+  --ibex-muted: #475569;
+  --ibex-primary: #0C4DA2;
+  --ibex-secondary: #0284C7;
+  --ibex-strong: #0C4DA2;
+  --ibex-logo: #061D2F;
+  --ibex-callout: #F0F9FF;
+  --ibex-callout-border: #0284C7;
+  --ibex-code-bg: #F1F5F9;
+  --ibex-code-text: #0369A1;
+  --ibex-table-header: #0C4DA2;
+  --ibex-table-header-text: #FFFFFF;
+  --ibex-table-even: #F8FAFC;
+  --ibex-table-border: #CBD5E1;
+  --ibex-amber-text: #92400E;
+  --ibex-amber-bg: #FFFBEB;
+  --ibex-green-text: #047857;
+  --ibex-green-bg: #ECFDF5;
+  --ibex-blue-text: #0C4DA2;
+  --ibex-blue-bg: #F0F9FF;
+  --ibex-purple-text: #6D28D9;
+  --ibex-purple-bg: #F5F3FF;
+  --ibex-red-text: #B91C1C;
+  --ibex-red-bg: #FEE2E2;
+  --ibex-button-text: #FFFFFF;
+  --ibex-focus: #0C4DA2;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --ibex-canvas: #061D2F;
+  --ibex-divider: #031120;
+  --ibex-surface: #0C2335;
+  --ibex-raised: #0A263D;
+  --ibex-inset: #031120;
+  --ibex-border: #1D3557;
+  --ibex-heading: #FFFFFF;
+  --ibex-text: #F4F6F9;
+  --ibex-muted: #8CA1AF;
+  --ibex-primary: #0C4DA2;
+  --ibex-secondary: #00B4D8;
+  --ibex-strong: #00B4D8;
+  --ibex-logo: #FFFFFF;
+  --ibex-callout: #0A263D;
+  --ibex-callout-border: #00B4D8;
+  --ibex-code-bg: #031120;
+  --ibex-code-text: #00E5FF;
+  --ibex-table-header: #0C4DA2;
+  --ibex-table-header-text: #FFFFFF;
+  --ibex-table-even: #0C2335;
+  --ibex-table-border: #1D3557;
+  --ibex-amber-text: #FBBF24;
+  --ibex-amber-bg: #30291D;
+  --ibex-green-text: #6EE7B7;
+  --ibex-green-bg: #123C36;
+  --ibex-blue-text: #00B4D8;
+  --ibex-blue-bg: #0A263D;
+  --ibex-purple-text: #C4B5FD;
+  --ibex-purple-bg: #30294A;
+  --ibex-red-text: #FCA5A5;
+  --ibex-red-bg: #7F1D1D;
+  --ibex-button-text: #FFFFFF;
+  --ibex-focus: #00B4D8;
+  color-scheme: dark;
+}
+/* Legacy --primary is an adaptive text accent; brand primary has its own role. */
+:root, body, body.theme-dark, body.theme-light {
+  --background-color: var(--ibex-canvas);
+  --section-divider-bg: var(--ibex-divider);
+  --card-bg: var(--ibex-surface);
+  --card-border: var(--ibex-border);
+  --card-well-bg: var(--ibex-inset);
+  --card-well-border: var(--ibex-border);
+  --card-callout-bg: var(--ibex-callout);
+  --card-callout-border: var(--ibex-callout-border);
+  --heading-color: var(--ibex-heading);
+  --primary-color: var(--ibex-primary);
+  --secondary-color: var(--ibex-secondary);
+  --text-color: var(--ibex-text);
+  --muted-color: var(--ibex-muted);
+  --line-color: var(--ibex-border);
+  --strong-color: var(--ibex-strong);
+  --code-bg: var(--ibex-code-bg);
+  --code-color: var(--ibex-code-text);
+  --table-header-bg: var(--ibex-table-header);
+  --table-even-bg: var(--ibex-table-even);
+  --table-border: var(--ibex-table-border);
+  --bg: var(--ibex-canvas);
+  --bg-page: var(--ibex-canvas);
+  --bg-primary: var(--ibex-canvas);
+  --surface: var(--ibex-surface);
+  --bg-surface: var(--ibex-surface);
+  --bg-card: var(--ibex-surface);
+  --surface-light: var(--ibex-inset);
+  --bg-surface-elevated: var(--ibex-raised);
+  --nested-bg: var(--ibex-inset);
+  --border: var(--ibex-border);
+  --border-color: var(--ibex-border);
+  --border-subtle: var(--ibex-border);
+  --border-hover: var(--ibex-focus);
+  --text: var(--ibex-text);
+  --text-main: var(--ibex-text);
+  --text-muted: var(--ibex-muted);
+  --text-subtle: var(--ibex-muted);
+  --primary: var(--ibex-strong);
+  --primary-accent: var(--ibex-strong);
+  --primary-hover: var(--ibex-secondary);
+  --primary-subtle: var(--ibex-callout);
+  --logo-text-color: var(--ibex-logo);
+  --bg-card-hover: var(--ibex-callout);
+  --bg-desc: var(--ibex-inset);
+  --btn-bg: var(--ibex-surface);
+  --btn-hover: var(--ibex-callout);
+  --btn-border: var(--ibex-muted);
+  --card-hover-border: var(--ibex-focus);
+  --table-stripe: var(--ibex-table-even);
+  --table-hover: var(--ibex-callout);
+  --date-badge-bg: var(--ibex-inset);
+  --date-badge-border: var(--ibex-border);
+  --date-badge-text: var(--ibex-text);
+  --accent: var(--ibex-purple-text);
+  --success: var(--ibex-green-text);
+  --warning: var(--ibex-amber-text);
+  --danger: var(--ibex-red-text);
+  --color-unchanged: var(--ibex-green-text);
+  --color-unchanged-bg: var(--ibex-green-bg);
+  --color-unchanged-border: var(--ibex-green-text);
+  --color-modified: var(--ibex-amber-text);
+  --color-modified-bg: var(--ibex-amber-bg);
+  --color-modified-border: var(--ibex-amber-text);
+  --color-new: var(--ibex-blue-text);
+  --color-new-bg: var(--ibex-blue-bg);
+  --color-new-border: var(--ibex-blue-text);
+  --badge-released-bg: var(--ibex-green-bg);
+  --badge-released-text: var(--ibex-green-text);
+  --badge-unreleased-bg: var(--ibex-blue-bg);
+  --badge-unreleased-text: var(--ibex-blue-text);
+  --badge-overdue-bg: var(--ibex-red-bg);
+  --badge-overdue-text: var(--ibex-red-text);
+  --badge-archived-bg: var(--ibex-inset);
+  --badge-archived-text: var(--ibex-muted);
+}
+html {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  scrollbar-gutter: stable;
+  background: var(--ibex-canvas);
+}
+body {
+  margin: 0;
+  padding: 24px;
+  min-height: 100vh;
+  background: var(--ibex-canvas);
+  color: var(--ibex-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+body > .container {
+  width: 100%;
+  max-width: 1280px;
+  min-width: 0;
+  margin: 0 auto;
+}
+.ibex-logo-svg {
+  height: 32px !important;
+  width: auto;
+  flex-shrink: 0;
+  color: var(--ibex-logo);
+}
+.ibex-logo-body { fill: var(--ibex-logo); }
+button, input, select { font: inherit; }
+button, .btn, .btn-action, .theme-toggle-btn { min-height: 40px; }
+:focus-visible { outline: 2px solid var(--ibex-focus); outline-offset: 3px; }
+.ibex-share-badge { color: var(--ibex-purple-text); background: var(--ibex-purple-bg); }
+body[data-ibex-page="releases"] .header {
+  padding-top: 0;
+  padding-bottom: 20px;
+  gap: 16px;
+}
+body[data-ibex-page="releases"] .header-brand { flex-wrap: wrap; gap: 10px !important; }
+body[data-ibex-page="releases"] .header-title h1 { font-size: 24px; }
+body[data-ibex-page="releases"] .header-title p { font-size: 14px; }
+body[data-ibex-page="actuals"] .logo-wrapper {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+body[data-ibex-page="actuals"] .logo-title-row { gap: 10px; }
+body[data-ibex-page="actuals"] .container { gap: 24px; }
+body[data-ibex-page="actuals"] .dashboard-section { padding: 0; min-width: 0; background: transparent; border: 0; box-shadow: none; }
+body[data-ibex-page="home"] .container { gap: 24px; }
+body[data-ibex-page="home"] .hero-banner {
+  padding: 0 0 20px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ibex-border);
+  border-radius: 0;
+  box-shadow: none;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+body[data-ibex-page="home"] .hero-title-row { flex-wrap: wrap; gap: 10px; }
+body[data-ibex-page="home"] .hero-title { font-size: 24px; font-weight: 700; white-space: normal; }
+body[data-ibex-page="home"] .hero-desc { font-size: 14px; }
+body[data-ibex-page="home"] .hero-tag { margin-bottom: 8px; }
+body[data-ibex-page="home"] .hero-content { flex-basis: 600px; }
+body[data-ibex-page="home"] .theme-toggle-btn {
+  background: var(--ibex-surface);
+  border-color: var(--ibex-border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+body[data-ibex-page="home"] .section-header { margin-bottom: 16px; }
+body[data-ibex-page="home"] .section-title { font-size: 20px; }
+body[data-ibex-page="home"] .audience-grid { gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body[data-ibex-page="home"] .modules-grid { gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+body[data-ibex-page="home"] .audience-card,
+body[data-ibex-page="home"] .module-card {
+  min-width: 0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: none;
+}
+body[data-ibex-page="home"] .audience-role { font-size: 14px; }
+body[data-ibex-page="home"] .audience-text,
+body[data-ibex-page="home"] .module-desc { font-size: 14px; }
+body[data-ibex-page="home"] .module-name { font-size: 18px; }
+body[data-ibex-page="home"] .module-card-top { flex-wrap: wrap; gap: 8px; }
+body[data-ibex-page="home"] .module-card:hover { box-shadow: none; }
+body[data-ibex-page="home"] .badge-releases { color: var(--ibex-blue-text); background: var(--ibex-blue-bg); border-color: var(--ibex-border); }
+body[data-ibex-page="home"] .badge-reqs { color: var(--ibex-amber-text); background: var(--ibex-amber-bg); border-color: var(--ibex-border); }
+body[data-ibex-page="home"] .badge-actuals { color: var(--ibex-green-text); background: var(--ibex-green-bg); border-color: var(--ibex-border); }
+/* Horizontal scrolling belongs to tables, never a clipped page wrapper. */
+.table-container, .warning-table-container, .child-table-container { max-width: 100%; overflow-x: auto; }
+@media (max-width: 1024px) {
+  body { padding: 16px; }
+  body[data-ibex-page="home"] .modules-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  body[data-ibex-page="home"] .audience-grid { grid-template-columns: 1fr; }
+  body[data-ibex-page="actuals"] .dashboard-section { padding: 0; }
+  .header-actions { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* Apply the skill palette by semantic role, independent of legacy view selectors. */
+body h1, body h2, body h3, body h4, body h5, body h6,
+body .hero-title, body .section-title, body .section-heading,
+body .module-name, body .audience-role { color:var(--ibex-heading); }
+body .hero-tag, body .section-tag, body .module-action { color:var(--ibex-strong); }
+body a:not(.module-card), body .ticket-link, body .epic-link { color:var(--ibex-strong); }
+body .btn-primary { background:var(--ibex-primary); border-color:var(--ibex-primary); color:var(--ibex-button-text); }
+body .btn-primary:hover { background:var(--ibex-primary); border-color:var(--ibex-secondary); box-shadow:0 0 0 1px var(--ibex-secondary); color:var(--ibex-button-text); }
+body button:not(.btn-primary), body input, body select { border-color:var(--ibex-muted); }
+body button:focus-visible, body input:focus-visible, body select:focus-visible, body a:focus-visible { outline-color:var(--ibex-focus); }
+body table { border-color:var(--ibex-table-border); }
+body thead, body thead th, body table.epics-table thead th,
+body .warning-table th, body.theme-dark .warning-table th { background:var(--ibex-table-header); color:var(--ibex-table-header-text); border-color:var(--ibex-table-border); }
+body tbody tr:nth-child(even) > td { background:var(--ibex-table-even); }
+body tbody tr:hover > td { background:var(--ibex-callout); }
+body td { border-color:var(--ibex-table-border); }
+body code, body pre { background:var(--ibex-code-bg); color:var(--ibex-code-text); }
+body .card-callout { background:var(--ibex-callout); border-color:var(--ibex-callout-border); }
+body .card-well, body .widget-stat-pill { background:var(--ibex-inset); }
+body .badge-type.Story { color:var(--ibex-blue-text); background:var(--ibex-blue-bg); border-color:var(--ibex-blue-text); }
+body .badge-type.Bug { color:var(--ibex-red-text); background:var(--ibex-red-bg); border-color:var(--ibex-red-text); }
+body .badge-type.Task { color:var(--ibex-green-text); background:var(--ibex-green-bg); border-color:var(--ibex-green-text); }
+body .bucket-badge { color:var(--ibex-purple-text); background:var(--ibex-purple-bg); border-color:var(--ibex-purple-text); }
+body .bucket-badge.bucket-none { color:var(--ibex-muted); background:var(--ibex-inset); border-color:var(--ibex-border); }
+body .badge-status { color:var(--ibex-muted); background:var(--ibex-inset); }
+
+body .pill-btn.active { background:var(--ibex-primary); color:var(--ibex-button-text); border-color:var(--ibex-primary); }
+body .loading-overlay, body .drag-target { background:var(--ibex-canvas); }
+body .loading-text { color:var(--ibex-text); }
+body .warning-count-badge { background:var(--ibex-amber-text); color:var(--ibex-surface); }
+:root[data-theme="dark"] body .warning-count-badge { color:var(--ibex-canvas); }
+body .pill-btn.active .pill-count { background:var(--ibex-primary); color:var(--ibex-button-text); }
+
+/* View heading selectors must outrank the legacy class-qualified h1/h2 rules. */
+body[data-ibex-page] h1, body[data-ibex-page] h2, body[data-ibex-page] h3,
+body[data-ibex-page] h4, body[data-ibex-page] h5, body[data-ibex-page] h6 { color:var(--ibex-heading); }
+body .stat-card, body .team-overview-card { background:var(--ibex-surface); }
+body .team-share-bar-fill { background:linear-gradient(90deg, var(--ibex-primary), var(--ibex-secondary)); }
+
+/* Shared branding footer used by the hub controller and standalone dashboards. */
+.ibex-hub-footer {
+  width: 100%;
+  margin-top: auto;
+  padding: 24px 0 4px;
+  border-top: 1px solid var(--ibex-border);
+  color: var(--ibex-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+.ibex-hub-footer--standalone { margin-top: 40px; }
+body[data-hub-active] .ibex-hub-footer--standalone,
+html[data-ibex-managed="true"] .ibex-hub-footer--standalone { display: none; }
+html[data-ibex-managed="true"] .ibex-hub-footer--has-status {
+  display: block;
+  margin-top: 24px;
+  padding: 12px 0 0;
+  border-top: 0;
+}
+html[data-ibex-managed="true"] .ibex-hub-footer--has-status .ibex-hub-footer__branding { display: none; }
+body[data-ibex-page] .container {
+  min-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 768px) {
+  .ibex-hub-footer { padding-top: 20px; font-size: 12px; }
+  body[data-ibex-page] .container { min-height: calc(100vh - 24px); }
+}
+</style>
+<script id="ibex-shared-theme" data-version="1.2.0">
+/* Ibex Hub design system 1.2.0. No network or Jira operations. */
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var explicit = null;
+  var managed = false;
+  var current;
+  var storageKey = 'ibex_theme';
+  var buttons = ['btnThemeToggle', 'themeToggleBtn', 'btn-theme'];
+  function valid(value) { return value === 'dark' || value === 'light'; }
+  function readSaved() {
+    try {
+      var keys = [storageKey, 'ibex_jira_theme', 'ibex-actuals-theme'];
+      for (var i = 0; i < keys.length; i++) {
+        var value = window.localStorage.getItem(keys[i]);
+        if (valid(value)) { return value; }
+      }
+    } catch (error) { /* Browser privacy settings may disable storage. */ }
+    return null;
+  }
+  function syncControls() {
+    if (!document.body) { return; }
+    document.body.classList.toggle('theme-dark', current === 'dark');
+    document.body.classList.toggle('theme-light', current === 'light');
+    var label = current === 'dark' ? 'Light Mode' : 'Dark Mode';
+    var icon = current === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
+    for (var i = 0; i < buttons.length; i++) {
+      var button = document.getElementById(buttons[i]);
+      if (button) {
+        button.setAttribute('aria-label', 'Switch to ' + label.toLowerCase());
+        button.setAttribute('aria-pressed', String(current === 'dark'));
+        if (buttons[i] === 'themeToggleBtn') { button.textContent = icon + ' ' + label; }
+      }
+    }
+    var ids = ['themeIcon', 'theme-icon'];
+    for (var j = 0; j < ids.length; j++) {
+      var node = document.getElementById(ids[j]);
+      if (node) { node.textContent = icon; }
+    }
+    ids = ['themeLabel', 'theme-label'];
+    for (var k = 0; k < ids.length; k++) {
+      var text = document.getElementById(ids[k]);
+      if (text) { text.textContent = label; }
+    }
+  }
+  function apply(theme, persist) {
+    if (!valid(theme)) { return false; }
+    current = theme;
+    root.setAttribute('data-theme', theme);
+    if (persist) {
+      explicit = theme;
+      try { window.localStorage.setItem(storageKey, theme); } catch (error) { /* In-memory preference remains usable. */ }
+    }
+    syncControls();
+    return true;
+  }
+  explicit = readSaved();
+  apply(explicit || (media && media.matches ? 'dark' : 'light'), false);
+  window.IbexTheme = {
+    init: syncControls,
+    apply: apply,
+    manage: function (theme) { managed = true; return apply(theme, false); },
+    toggle: function () { apply(current === 'dark' ? 'light' : 'dark', true); },
+    get: function () { return current; }
+  };
+  document.addEventListener('DOMContentLoaded', syncControls);
+  window.addEventListener('storage', function (event) {
+    if (managed) { return; }
+    if (event.key !== storageKey && event.key !== null) { return; }
+    explicit = valid(event.newValue) ? event.newValue : null;
+    apply(explicit || (media && media.matches ? 'dark' : 'light'), false);
+  });
+  function onSystemChange() {
+    if (!explicit && !managed) { apply(media && media.matches ? 'dark' : 'light', false); }
+  }
+  if (media && media.addEventListener) { media.addEventListener('change', onSystemChange); }
+  else if (media && media.addListener) { media.addListener(onSystemChange); }
+}());
+</script>
+<style id="ibex-orphan-banner-styles">
+/* Quarter audit uses the existing warning colors; it does not affect Actuals totals. */
+.orphan-banner { margin-bottom:24px; padding:16px 20px; border:1px solid var(--ibex-amber-text); border-radius:10px; background:var(--ibex-amber-bg); color:var(--ibex-amber-text); min-width:0; }
+.orphan-banner[hidden], .orphan-banner [hidden] { display:none !important; }
+.orphan-banner-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+body[data-ibex-page="actuals"] .orphan-banner h2 { color:var(--ibex-amber-text); font-size:15px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0; }
+.orphan-banner-count { font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; background:var(--ibex-amber-text); color:var(--ibex-surface); }
+:root[data-theme="dark"] .orphan-banner-count { color:var(--ibex-canvas); }
+.orphan-banner-subtitle, .orphan-banner-status { font-size:13px; line-height:1.5; margin:6px 0 0; }
+.orphan-banner-actions { display:flex; gap:8px; flex-wrap:wrap; }
+body .orphan-banner .orphan-banner-button { font-size:12px; min-height:40px; padding:6px 12px; border:1px solid var(--ibex-amber-text); border-radius:6px; color:var(--ibex-amber-text); background:transparent; cursor:pointer; }
+body .orphan-banner .orphan-banner-button:hover { background:var(--ibex-surface); }
+.orphan-banner-details { margin-top:16px; border-top:1px solid var(--ibex-amber-text); padding-top:14px; }
+body[data-ibex-page="actuals"] .orphan-banner h3 { color:var(--ibex-amber-text); font-size:14px; margin:0 0 8px; }
+.orphan-table-scroll { width:100%; max-width:100%; overflow-x:auto; margin-bottom:16px; border:1px solid var(--ibex-table-border); border-radius:6px; background:var(--ibex-surface); }
+.orphan-table { width:100%; border-collapse:collapse; font-size:12px; color:var(--ibex-text); }
+.orphan-items-table { min-width:1080px; }
+.orphan-table th, .orphan-table td { text-align:left; padding:10px 12px; vertical-align:top; border-bottom:1px solid var(--ibex-table-border); }
+.orphan-table .orphan-number { text-align:right; white-space:nowrap; }
+.orphan-table .orphan-key { white-space:nowrap; }
+.orphan-table .orphan-basis { min-width:190px; }
+.orphan-banner-footnote { color:var(--ibex-muted); font-size:12px; margin:0; }
+@media(max-width:600px) { .orphan-banner { padding:14px 12px; } }
+</style>
+<!-- ibex-central-child:start -->
+<meta name="ibex-hub-origin" content="https://n-4sumv24wosbypslyh7opm7au6xlqvi27ubofrci-0lu-script.googleusercontent.com">
+<style>
+[data-ibex-managed="true"] { scrollbar-gutter:auto; }
+[data-ibex-managed="true"] body { padding:0; min-height:0; }
+[data-ibex-managed="true"] #btnThemeToggle,
+[data-ibex-managed="true"] #themeToggleBtn,
+[data-ibex-managed="true"] #btn-theme,
+[data-ibex-managed="true"] .ibex-logo-svg { display:none; }
+</style>
+<script>
+/* Shared theme adapter for the Apps Script frame chain. No Jira data is sent. */
+(function () {
+  'use strict';
+  var config = document.querySelector('meta[name="ibex-hub-origin"]');
+  if (!config || !window.IbexTheme) { return; }
+  var origin = config.content;
+  var session = null;
+  var controller = null;
+  var heartbeat = null;
+  var expiry = null;
+  var lastHeight = 0;
+  var scheduled = false;
+  var sizeObserver = null;
+  var mutationObserver = null;
+  function validTheme(value) { return value === 'light' || value === 'dark'; }
+  function ancestorIs(sender) {
+    var cursor = window;
+    for (var i = 0; i < 12; i++) {
+      if (cursor.parent === cursor) { break; }
+      cursor = cursor.parent;
+      if (cursor === sender) { return true; }
+    }
+    return false;
+  }
+  function height() {
+    if (!document.body || document.body.getBoundingClientRect().height <= 0) { return null; }
+    return Math.min(50000, Math.max(100, Math.ceil(Math.max(document.body.scrollHeight, document.body.getBoundingClientRect().height))));
+  }
+  function send(type) {
+    if (!controller || !session) { return; }
+    controller.postMessage({schema:'ibex-theme/v2',type:type,session:session,theme:window.IbexTheme.get(),height:height()},origin);
+  }
+  function resize() {
+    if (!controller || scheduled) { return; }
+    scheduled = true;
+    window.requestAnimationFrame(function () {
+      scheduled = false;
+      var measured = height();
+      if (measured !== null && measured !== lastHeight) { lastHeight = measured; send('resize'); }
+    });
+  }
+  window.addEventListener('message',function (event) {
+    var data = event.data;
+    if (event.origin !== origin || !session || !data || data.schema !== 'ibex-theme/v2' ||
+        data.session !== session || data.type !== 'set' || !validTheme(data.theme) ||
+        !ancestorIs(event.source) || (controller && controller !== event.source)) { return; }
+    controller = event.source;
+    window.clearInterval(heartbeat);
+    window.clearTimeout(expiry);
+    document.documentElement.setAttribute('data-ibex-managed','true');
+    window.IbexTheme.manage(data.theme);
+    lastHeight = height();
+    send('applied');
+  });
+  function ready() {
+    var cursor = window;
+    for (var i = 0; i < 12; i++) {
+      if (cursor.parent === cursor) { break; }
+      cursor = cursor.parent;
+      cursor.postMessage({schema:'ibex-theme/v2',type:'ready',session:session},origin);
+    }
+  }
+  function begin(location) {
+    var value = location && location.parameter && location.parameter.ibexHubSession;
+    if (typeof value !== 'string' || !/^[a-f0-9]{32}$/.test(value)) { return; }
+    session = value;
+    function start() {
+      ready();
+      heartbeat = window.setInterval(function () { if (!controller) { ready(); } },500);
+      expiry = window.setTimeout(function () { window.clearInterval(heartbeat); },20000);
+      if (window.ResizeObserver) { sizeObserver = new window.ResizeObserver(resize); sizeObserver.observe(document.body); }
+      if (window.MutationObserver) { mutationObserver = new window.MutationObserver(resize); mutationObserver.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true}); }
+      // Hidden frames do not reliably produce a resize callback when shown again.
+      window.setInterval(resize,750);
+    }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded',start); }
+    else { start(); }
+  }
+  if (window.google && window.google.script && window.google.script.url) {
+    window.google.script.url.getLocation(begin);
+  }
+}());
+</script>
+<!-- ibex-central-child:end -->
 </head>
-<body>
+<body data-ibex-page="actuals">
 
   <!-- Drag & Drop overlay for optional manual CSV upload -->
   <div class="drag-target" id="dragTarget">
@@ -996,7 +1545,7 @@
         <div class="title-group">
           <div class="logo-title-row">
             <div class="logo-wrapper" title="Ibex Medical Analytics">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 585.7 286.6" class="ibex-logo-svg" style="height: 34px; width: auto; overflow: visible; vertical-align: middle;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 585.7 286.6" role="img" aria-label="Ibex Medical Analytics" class="ibex-logo-svg" style="height: 34px; width: auto; overflow: visible; vertical-align: middle;">
                 <defs>
                   <linearGradient id="ibex-orange-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="#FF0786"/>
@@ -1014,28 +1563,15 @@
                 <path fill="url(#ibex-orange-gradient)" d="M467.5,139.2c-3.3,0-6.5-1.2-9-3.7c-5-5-5-13.1,0-18.1L528.8,47c5-5,13.1-5,18.1,0c5,5,5,13.1,0,18.1l-70.3,70.3C474,137.9,470.7,139.2,467.5,139.2z"/>
               </svg>
             </div>
-            <h1>
-              <span id="dashboardQuarterTitle">2026 Q3</span> - Actual Effort Dashboard
-              <span class="badge-quarter" id="badgeQuarterText">26Q3 Actuals</span>
-            </h1>
           </div>
-          <div class="source-info-bar">
-            <span>Data Source: <strong>Jira Cloud API</strong></span>
-            <span class="badge-status-pill badge-status-live" id="badgeCacheStatus">Live Data</span>
-            <span>Last Updated: <strong id="lblLastUpdated">--</strong></span>
+          <div class="content-header">
+            <h1>Quarterly Actuals</h1>
+            <p>Live data tracked from Jira Cloud - powered by Google Apps Script</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <!-- Dynamic Quarter Selector -->
-          <div class="quarter-select-wrapper" title="Select quarter to inspect actual effort">
-            <span class="quarter-select-label">Quarter:</span>
-            <select id="quarterSelect" class="quarter-select">
-              <option value="2026_Q3" selected>2026 Q3</option>
-              <option value="2026_Q4">2026 Q4</option>
-            </select>
-          </div>
-
+          <span class="header-last-updated">Last Updated: <strong id="lblLastUpdated">--</strong></span>
           <!-- Refresh Live from Jira Button -->
           <button class="btn btn-primary" id="btnRefreshLive" type="button" title="Fetch fresh data from Jira bypassing cache">
             <svg id="refreshIcon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -1049,11 +1585,39 @@
         </div>
       </div>
 
+      <nav class="quarter-nav" aria-label="Select quarterly actuals period">
+        <button class="quarter-tab" type="button" data-quarter="2026_Q3" aria-pressed="false">2026 Q3</button>
+        <button class="quarter-tab" type="button" data-quarter="2026_Q4" aria-pressed="true">2026 Q4</button>
+      </nav>
+
+      <section id="orphanBanner" class="orphan-banner" aria-labelledby="orphanBannerTitle" hidden>
+        <div class="orphan-banner-header">
+          <h2 id="orphanBannerTitle"><span aria-hidden="true">⚠️</span> Items with No Parent Epic <span id="orphanCount" class="orphan-banner-count" hidden></span></h2>
+          <div class="orphan-banner-actions">
+            <button id="orphanToggle" class="orphan-banner-button" type="button" aria-expanded="false" aria-controls="orphanDetails" hidden>Show Details ▼</button>
+            <button id="orphanRetry" class="orphan-banner-button" type="button" hidden>Retry Audit</button>
+          </div>
+        </div>
+        <p id="orphanSubtitle" class="orphan-banner-subtitle"></p>
+        <p id="orphanStatus" class="orphan-banner-status" role="status" aria-live="polite"></p>
+        <div id="orphanDetails" class="orphan-banner-details" hidden>
+          <h3>Team Summary</h3>
+          <div class="orphan-table-scroll" role="region" aria-label="Items without a parent epic by team" tabindex="0">
+            <table class="orphan-table"><thead><tr><th scope="col">Team</th><th scope="col" class="orphan-number">Items</th><th scope="col" class="orphan-number">Story Points</th></tr></thead><tbody id="orphanTeamRows"></tbody></table>
+          </div>
+          <h3>Detailed Items</h3>
+          <div class="orphan-table-scroll" role="region" aria-label="Items without a parent epic details" tabindex="0">
+            <table class="orphan-table orphan-items-table"><thead><tr><th scope="col">Issue Key</th><th scope="col">Type</th><th scope="col">Summary</th><th scope="col">Status</th><th scope="col">Assignee</th><th scope="col">Reporter</th><th scope="col" class="orphan-number">Story Points</th><th scope="col">Team</th><th scope="col">Quarter Basis</th></tr></thead><tbody id="orphanItemRows"></tbody></table>
+          </div>
+          <p class="orphan-banner-footnote">Audit figures are separate from completed Actuals totals. Missing story points are shown as "-" and are excluded from the story-point sum.</p>
+        </div>
+      </section>
+
       <!-- Subsection 1A: Section Header & Global Key Metrics -->
       <div class="section-title-wrap">
         <span class="section-tag">Section 1</span>
         <h2 class="section-heading">Overview & Executive Summary</h2>
-        <p class="section-subtext">High-level delivery summary across all engineering and clinical teams for <span class="lblQuarterSubtext">2026 Q3</span></p>
+        <p class="section-subtext">High-level delivery summary across all engineering and clinical teams for <span class="lblQuarterSubtext">2026 Q4</span></p>
       </div>
 
       <!-- Jira Data Source Explanation Callout -->
@@ -1190,8 +1754,8 @@
       </div>
     </section>
 
-    <footer>
-      Ibex Medical Analytics - Quarterly Planning Actual Effort Dashboard - Powered by Jira Cloud API & Google Apps Script
+    <footer class="ibex-hub-footer ibex-hub-footer--standalone">
+      Ibex Medical Analytics - Quarterly Actuals - Powered by Jira Cloud API &amp; Google Apps Script
     </footer>
   </div>
 
@@ -1202,7 +1766,7 @@
     let activeTeamFilter = 'ALL';
     let activeBucketFilter = 'ALL';
     let searchQuery = '';
-    let currentQuarter = '2026_Q3';
+    let currentQuarter = '2026_Q4';
 
     const teamSortStates = {};
     const teamExpandedStates = {};
@@ -1213,29 +1777,8 @@
     const bucketEpicExpandedStates = {};
 
     // Theme Management
-    function initTheme() {
-      const savedTheme = localStorage.getItem('ibex_theme') || localStorage.getItem('ibex-actuals-theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
-        document.body.classList.add('theme-light');
-        document.getElementById('themeIcon').textContent = '🌙';
-        const lbl = document.getElementById('themeLabel');
-        if (lbl) lbl.textContent = 'Dark Mode';
-      } else {
-        document.body.classList.remove('theme-light');
-        document.getElementById('themeIcon').textContent = '☀️';
-        const lbl = document.getElementById('themeLabel');
-        if (lbl) lbl.textContent = 'Light Mode';
-      }
-    }
-
-    function toggleTheme() {
-      const isLight = document.body.classList.toggle('theme-light');
-      localStorage.setItem('ibex_theme', isLight ? 'light' : 'dark');
-      document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
-      const lbl = document.getElementById('themeLabel');
-      if (lbl) lbl.textContent = isLight ? 'Dark Mode' : 'Light Mode';
-    }
+    function initTheme() { window.IbexTheme.init(); }
+    function toggleTheme() { window.IbexTheme.toggle(); }
 
     // UI Loading state
     function showLoading(show, message) {
@@ -1472,11 +2015,11 @@
               <span class="team-card-effort">${bSp.toFixed(1)} SP</span>
             </div>
             <div class="team-share-bar-wrap">
-              <div class="team-share-bar-fill" style="width: ${Math.min(parseFloat(pct), 100)}%; background: linear-gradient(90deg, #818cf8, #c084fc);"></div>
+              <div class="team-share-bar-fill" style="width: ${Math.min(parseFloat(pct), 100)}%; background: linear-gradient(90deg, var(--ibex-primary), var(--ibex-secondary));"></div>
             </div>
             <div class="team-card-bottom">
               <span><strong>${epicsCount}</strong> Epics • <strong>${bObj.totalTickets}</strong> Child Tickets</span>
-              <span class="team-card-pct" style="background: rgba(129, 140, 248, 0.15); color: #a5b4fc;">${pct}%</span>
+              <span class="team-card-pct ibex-share-badge">${pct}%</span>
             </div>
           `;
           card.addEventListener('click', () => focusOnBucket(bObj.name));
@@ -1953,21 +2496,11 @@
     function onDataReceived(payload) {
       hideError();
       currentQuarter = payload.quarter || currentQuarter;
+      setActiveQuarterTab(currentQuarter);
       const displayQuarter = currentQuarter.replace('_', ' ');
 
-      document.getElementById('dashboardQuarterTitle').textContent = displayQuarter;
-      document.getElementById('badgeQuarterText').textContent = currentQuarter.replace('2026_', '26') + ' Actuals';
       const subLabels = document.querySelectorAll('.lblQuarterSubtext');
       subLabels.forEach(el => el.textContent = displayQuarter);
-
-      const cacheBadge = document.getElementById('badgeCacheStatus');
-      if (payload.fromCache) {
-        cacheBadge.className = 'badge-status-pill badge-status-cache';
-        cacheBadge.textContent = 'Cached (1h)';
-      } else {
-        cacheBadge.className = 'badge-status-pill badge-status-live';
-        cacheBadge.textContent = 'Live Data';
-      }
 
       if (payload.lastUpdated) {
         const d = new Date(payload.lastUpdated);
@@ -1985,7 +2518,10 @@
       renderBucketWidgets();
     }
 
+    let actualsRequestGeneration = 0;
     function fetchQuarterData(quarterKey, forceRefresh) {
+      const requestGeneration = ++actualsRequestGeneration;
+      if (window.IbexOrphanAudit) window.IbexOrphanAudit.load(quarterKey, !!forceRefresh);
       showLoading(true, `Querying Jira Cloud for ${quarterKey.replace('_', ' ')} sprints and actuals...`);
       const refreshIcon = document.getElementById('refreshIcon');
       if (forceRefresh && refreshIcon) refreshIcon.classList.add('rotating');
@@ -1993,11 +2529,13 @@
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(function(response) {
+            if (requestGeneration !== actualsRequestGeneration || currentQuarter !== quarterKey) return;
             showLoading(false);
             if (refreshIcon) refreshIcon.classList.remove('rotating');
             onDataReceived(response);
           })
           .withFailureHandler(function(err) {
+            if (requestGeneration !== actualsRequestGeneration || currentQuarter !== quarterKey) return;
             showLoading(false);
             if (refreshIcon) refreshIcon.classList.remove('rotating');
             showError('Failed to load quarterly actuals from Jira: ' + (err.message || err));
@@ -2012,14 +2550,15 @@
     }
 
     function setupListeners() {
-      // Quarter Selector
-      const qSelect = document.getElementById('quarterSelect');
-      if (qSelect) {
-        qSelect.addEventListener('change', (e) => {
-          currentQuarter = e.target.value;
+      document.querySelectorAll('.quarter-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const quarter = tab.getAttribute('data-quarter');
+          if (!quarter || quarter === currentQuarter) return;
+          currentQuarter = quarter;
+          setActiveQuarterTab(currentQuarter);
           fetchQuarterData(currentQuarter, false);
         });
-      }
+      });
 
       // Refresh Live
       const btnRefresh = document.getElementById('btnRefreshLive');
@@ -2078,12 +2617,95 @@
       if (btnColB) btnColB.addEventListener('click', () => setAllBucketExpansion(false));
     }
 
+    function setActiveQuarterTab(quarter) {
+      document.querySelectorAll('.quarter-tab').forEach((tab) => {
+        tab.setAttribute('aria-pressed', String(tab.getAttribute('data-quarter') === quarter));
+      });
+    }
+
     // Initialization
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       setupListeners();
-      fetchQuarterData('2026_Q3', false);
+      fetchQuarterData('2026_Q4', false);
     });
   </script>
+<script id="ibex-orphan-banner">
+/* Independent quarter audit. All Jira-sourced text is escaped before rendering. */
+(function () {
+  'use strict';
+  var banner = document.getElementById('orphanBanner');
+  if (!banner) { return; }
+  var toggle = document.getElementById('orphanToggle');
+  var retry = document.getElementById('orphanRetry');
+  var details = document.getElementById('orphanDetails');
+  var count = document.getElementById('orphanCount');
+  var status = document.getElementById('orphanStatus');
+  var subtitle = document.getElementById('orphanSubtitle');
+  var teamRows = document.getElementById('orphanTeamRows');
+  var itemRows = document.getElementById('orphanItemRows');
+  var requestedQuarter = '', generation = 0;
+  function escape(value) {
+    return String(value === null || value === undefined ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function number(value) { return Number(value).toLocaleString(undefined, {maximumFractionDigits: 6}); }
+  function collapse() { details.hidden = true; toggle.setAttribute('aria-expanded', 'false'); toggle.textContent = 'Show Details ▼'; }
+  toggle.addEventListener('click', function () {
+    var open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open)); details.hidden = !open;
+    toggle.textContent = open ? 'Hide Details ▲' : 'Show Details ▼';
+  });
+  retry.addEventListener('click', function () { load(requestedQuarter, true); });
+  function failure() {
+    banner.hidden = false; count.hidden = true; toggle.hidden = true; retry.hidden = false; collapse();
+    teamRows.innerHTML = ''; itemRows.innerHTML = '';
+    status.textContent = 'The items audit could not finish. Retry to load a complete result.';
+  }
+  // Apps Script RPC can omit nullable fields; absent and null points are both unestimated.
+  function valid(result, quarter) {
+    if (!result || result.complete !== true || result.quarter !== quarter || !Array.isArray(result.items) || !Array.isArray(result.teams) || result.count !== result.items.length || !Number.isFinite(result.storyPoints)) { return false; }
+    var keys = new Set();
+    return result.items.every(function (item) {
+      if (!item || !/^IBX-\d+$/.test(item.key || '') || keys.has(item.key) || !Array.isArray(item.sprints) || !item.sprints.every(function (s) { return typeof s === 'string'; })) { return false; }
+      keys.add(item.key);
+      return ['summary', 'type', 'status', 'assignee', 'reporter', 'team', 'created'].every(function (field) { return typeof item[field] === 'string'; }) && (item.storyPoints === null || item.storyPoints === undefined || Number.isFinite(item.storyPoints));
+    }) && result.teams.every(function (team) { return team && typeof team.team === 'string' && Number.isInteger(team.count) && team.count >= 0 && Number.isFinite(team.storyPoints); }) && result.teams.reduce(function (sum, team) { return sum + team.count; }, 0) === result.count && Math.abs(result.items.reduce(function (sum, item) { return sum + (item.storyPoints === null || item.storyPoints === undefined ? 0 : item.storyPoints); }, 0) - result.storyPoints) < 0.000001 && Math.abs(result.teams.reduce(function (sum, team) { return sum + team.storyPoints; }, 0) - result.storyPoints) < 0.000001;
+  }
+  function render(result) {
+    if (!result.count) { banner.hidden = true; status.textContent = ''; return; }
+    banner.hidden = false; retry.hidden = true; toggle.hidden = false; count.hidden = false;
+    count.textContent = number(result.count);
+    var updated = new Date(result.lastUpdated);
+    var freshness = Number.isNaN(updated.getTime()) ? '' : ' Updated ' + updated.toLocaleString() + '.';
+    status.textContent = number(result.count) + ' items · ' + number(result.storyPoints) + ' SP. ' + (result.fromCache ? 'Cached result.' : 'Live result.') + freshness;
+    teamRows.innerHTML = result.teams.map(function (team) {
+      return '<tr><td>' + escape(team.team) + '</td><td class="orphan-number">' + number(team.count) + '</td><td class="orphan-number">' + number(team.storyPoints) + '</td></tr>';
+    }).join('') + '<tr><td><strong>Total</strong></td><td class="orphan-number"><strong>' + number(result.count) + '</strong></td><td class="orphan-number"><strong>' + number(result.storyPoints) + '</strong></td></tr>';
+    itemRows.innerHTML = result.items.map(function (item) {
+      var basis = item.sprints.slice();
+      if (item.pathoCreatedInQuarter) { basis.push('Patho Task created ' + (item.created.substring(0, 10) || 'in selected quarter')); }
+      return '<tr><td class="orphan-key"><a href="https://ibex-ai.atlassian.net/browse/' + encodeURIComponent(item.key) + '" target="_blank" rel="noopener noreferrer">' + escape(item.key) + '</a></td><td>' + escape(item.type) + '</td><td>' + escape(item.summary) + '</td><td>' + escape(item.status) + '</td><td>' + escape(item.assignee) + '</td><td>' + escape(item.reporter) + '</td><td class="orphan-number">' + (item.storyPoints === null || item.storyPoints === undefined ? '-' : number(item.storyPoints)) + '</td><td>' + escape(item.team) + '</td><td class="orphan-basis">' + escape(basis.join('; ')) + '</td></tr>';
+    }).join('');
+  }
+  function load(quarter, forceRefresh) {
+    requestedQuarter = quarter;
+    var requestGeneration = ++generation;
+    banner.hidden = false; count.hidden = true; toggle.hidden = true; retry.hidden = true; collapse();
+    teamRows.innerHTML = ''; itemRows.innerHTML = '';
+    subtitle.textContent = 'All statuses in ' + quarter.replace('_', ' ') + ' sprints, plus parentless Patho Tasks created during the quarter.';
+    status.textContent = 'Checking items without a parent epic...';
+    var run = window.google && window.google.script && window.google.script.run;
+    if (!run) { failure(); return; }
+    run.withSuccessHandler(function (result) {
+      if (generation !== requestGeneration || requestedQuarter !== quarter) { return; }
+      if (!valid(result, quarter)) { failure(); return; }
+      render(result);
+    }).withFailureHandler(function (error) {
+      if (generation === requestGeneration && requestedQuarter === quarter) { failure(); }
+    }).apiGetQuarterOrphans(quarter, !!forceRefresh);
+  }
+  window.IbexOrphanAudit = {load: load};
+}());
+</script>
 </body>
 </html>
